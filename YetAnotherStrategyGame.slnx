@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Tests/Tests.csproj" Id="de9132da-c5d9-4560-841c-6ed9d99afe7d" />
   <Project Path="YetAnotherStrategyGame/YetAnotherStrategyGame.csproj" Id="a96d1897-85b8-460a-aed4-cf1ced89790f" />
 </Solution>
