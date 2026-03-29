@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace YetAnotherStrategyGame.Domain
 {
-
     class Game
     {
         public State GameState { get; private set; }

@@ -122,8 +122,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\AmmunitionType.cs" />
+    <Compile Include="Domain\Barracks.cs" />
+    <Compile Include="Domain\Cannon.cs" />
+    <Compile Include="Domain\CannonFactory.cs" />
+    <Compile Include="Domain\Castle.cs" />
+    <Compile Include="Domain\Color.cs" />
+    <Compile Include="Domain\Crossbowman.cs" />
+    <Compile Include="Domain\CrossbowWorkshop.cs" />
+    <Compile Include="Domain\Equipment.cs" />
+    <Compile Include="Domain\Farm.cs" />
+    <Compile Include="Domain\Field.cs" />
     <Compile Include="Domain\Game.cs" />
-    <Compile Include="Domain\Point.cs" />
+    <Compile Include="Domain\Cell.cs" />
+    <Compile Include="Domain\IAmmunitionBuilding.cs" />
+    <Compile Include="Domain\IBuilding.cs" />
+    <Compile Include="Domain\IEntity.cs" />
+    <Compile Include="Domain\IProductionBuilding.cs" />
+    <Compile Include="Domain\IRangedUnit.cs" />
+    <Compile Include="Domain\IResourceBuilding.cs" />
+    <Compile Include="Domain\ISpawnBuilding.cs" />
+    <Compile Include="Domain\IUnit.cs" />
+    <Compile Include="Domain\Mine.cs" />
+    <Compile Include="Domain\PassiveResourceType.cs" />
+    <Compile Include="Domain\Player.cs" />
+    <Compile Include="Domain\State.cs" />
+    <Compile Include="Domain\Team.cs" />
+    <Compile Include="Domain\UnitType.cs" />
+    <Compile Include="Domain\Warrior.cs" />
     <Compile Include="Views\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
