@@ -1,6 +1,6 @@
 ﻿namespace ClassLibrary1
 {
-    public enum Color
+    public enum TeamColor
     {
         None,
         Blue,

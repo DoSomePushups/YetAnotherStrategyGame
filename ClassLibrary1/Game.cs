@@ -2,7 +2,7 @@
 {
     public class Game
     {
-        public State GameState { get; private set; }
+        public GameState GameState { get; private set; }
 
         public Player FirstPlayer { get; private set; }
 
@@ -12,17 +12,18 @@
 
         public Game()
         {
-            GameState = State.MainScreen;
+            GameState = GameState.MainScreen;
             FirstPlayer = new Player("User", ++LastPlayerId);
             SecondPlayer = new Player("AI", ++LastPlayerId);
         }
 
-        public void ChangeGameState(State newState)
+        public void ChangeGameState(GameState newState)
         {
             GameState = newState;
-            StateChanged?.Invoke(this, newState);
+            StateChanged?.Invoke(GameState);
         }
 
-        public event EventHandler<State> StateChanged;
+        // Событие, уведомляющее об изменении состояния игры
+        public event Action<GameState> StateChanged;
     }
 }

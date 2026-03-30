@@ -8,7 +8,7 @@
 
         public Team Team { get; private set; }
 
-        public Color Color { get; private set; }
+        public TeamColor Color { get; private set; }
 
         public HashSet<IBuilding> OwnedBuildings { get; private set; }
 
@@ -23,7 +23,7 @@
             Name = name;
             Id = id;
             Team = (Team)id;
-            Color = (Color)id;
+            Color = (TeamColor)id;
             OwnedBuildings = new HashSet<IBuilding>();
             OwnedUnits = new HashSet<IUnit>();
             Gold = 0;

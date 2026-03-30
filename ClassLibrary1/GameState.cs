@@ -1,6 +1,6 @@
 ﻿namespace ClassLibrary1
 {
-    public enum State
+    public enum GameState
     {
         MainScreen,
         PlayOptionScreen,

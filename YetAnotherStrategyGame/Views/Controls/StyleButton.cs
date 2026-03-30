@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace YetAnotherStrategyGame.Views
+namespace YetAnotherStrategyGame.Views.Controls
 {
     // Базовый класс для всех кнопок с общим дизайном
     public class StyledButton : Button
