@@ -4,9 +4,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using YetAnotherStrategyGame.Views.Controls;
-using static System.Windows.Forms.AxHost;
 
-namespace YetAnotherStrategyGame.Views
+namespace YetAnotherStrategyGame.Views.Controls.Screens
 {
     [DesignerCategory("Code")]
     public partial class PlayOptionScreenControl : UserControl
@@ -42,7 +41,7 @@ namespace YetAnotherStrategyGame.Views
 
             // Привязка событий
             backButton.Click += BackButton_Click;
-            // Остальные пока ничего не делают
+            // Остальные кнопки пока ничего не делают
 
             this.Controls.Add(titleLabel);
             this.Controls.Add(freePlayButton);

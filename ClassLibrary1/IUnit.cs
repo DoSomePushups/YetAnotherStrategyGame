@@ -9,5 +9,7 @@
         int AttackCD { get; }
 
         int MoveCD { get; }
+
+        public void ActUpon(Cell actionObject);
     }
 }

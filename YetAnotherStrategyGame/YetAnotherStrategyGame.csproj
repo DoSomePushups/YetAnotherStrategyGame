@@ -12,8 +12,4 @@
     <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Controls\Screens\" />
-  </ItemGroup>
-
 </Project>

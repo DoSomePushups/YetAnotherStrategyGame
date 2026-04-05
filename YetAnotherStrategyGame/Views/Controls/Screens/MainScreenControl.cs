@@ -4,9 +4,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using YetAnotherStrategyGame.Views.Controls;
-using static System.Windows.Forms.AxHost;
 
-namespace YetAnotherStrategyGame.Views
+namespace YetAnotherStrategyGame.Views.Controls.Screens
 {
     [DesignerCategory("Code")]
     public partial class MainScreenControl : UserControl
@@ -25,7 +24,7 @@ namespace YetAnotherStrategyGame.Views
         private void InitializeComponent()
         {
             this.BackColor = Color.FromArgb(190, 225, 150);
-            this.Dock = DockStyle.Fill; // Заполнять всю форму
+            this.Dock = DockStyle.Fill;
 
             titleLabel = new Label()
             {
@@ -66,7 +65,7 @@ namespace YetAnotherStrategyGame.Views
             Application.Exit();
         }
 
-        // Центрируем элементы при изменении размера окна
+        // Центрирование элементов при изменении размера окна
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);

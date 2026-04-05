@@ -3,8 +3,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using YetAnotherStrategyGame.Views;
-using static System.Windows.Forms.AxHost;
+using YetAnotherStrategyGame.Views.Controls.Screens;
 
 namespace YetAnotherStrategyGame
 {
@@ -13,36 +12,35 @@ namespace YetAnotherStrategyGame
     {
         private Game _game;
 
-        // Экземпляры наших экранов
+        // Экземпляры экранов
         private MainScreenControl _mainScreen;
         private PlayOptionScreenControl _playOptionScreen;
 
         public MainForm()
         {
-            // Теперь этот метод определен ниже в этом же файле
             InitializeComponent();
 
             _game = new Game();
             _game.StateChanged += Game_OnStateChanged;
 
-            // Настраиваем экраны и показываем начальный
+            // Настройка экранов и показ начального
             ConfigureScreens();
             ShowMainScreen();
         }
 
         private void InitializeComponent()
         {
-            // Базовые настройки окна (то, что раньше делал дизайнер)
+            // Базовые настройки окна
             this.Text = "Yet Another Strategy Game";
-            this.Size = new Size(1000, 600);
+            this.Size = new Size(1920, 1080);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(190, 225, 150);
 
-            // Инициализируем контролы экранов
+            // Инициализация контролов экранов
             _mainScreen = new MainScreenControl();
             _playOptionScreen = new PlayOptionScreenControl();
 
-            // Добавляем их на форму
+            // Добавление на форму
             this.Controls.Add(_mainScreen);
             this.Controls.Add(_playOptionScreen);
         }
@@ -55,7 +53,7 @@ namespace YetAnotherStrategyGame
 
         private void Game_OnStateChanged(GameState state)
         {
-            // Логика переключения экранов на основе состояния модели
+            // Переключения экранов на основе состояния модели
             switch (state)
             {
                 case GameState.MainScreen:
