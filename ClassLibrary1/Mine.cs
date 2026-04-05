@@ -18,7 +18,9 @@
 
         public Cell Location { get; private set; }
 
-        public Mine(Cell location)
+        public Player Owner { get; private set; }
+
+        public Mine(Cell location, Player owner)
         {
             MaxHP = 800;
             HP = 800;
@@ -28,7 +30,8 @@
             PassiveProductionTime = 6;
             PassiveResourceType = PassiveResourceType.Gold;
             Location = location;
-            location.Put(this);
+            Owner = owner;
+            location.PutEntity(this);
         }
 
         public void Heal(int heal)

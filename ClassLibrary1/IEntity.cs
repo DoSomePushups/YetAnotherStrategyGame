@@ -8,6 +8,8 @@
 
         Cell Location { get; }
 
+        Player Owner { get; }
+
         public void TakeDamage(int damage);
 
         public void Heal(int heal);

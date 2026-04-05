@@ -30,7 +30,9 @@
 
         public Cell Location {  get; private set; }
 
-        public CannonFactory(Cell location)
+        public Player Owner { get; private set; }
+
+        public CannonFactory(Cell location, Player owner)
         {
             MaxHP = 1800;
             HP = 1800;
@@ -46,7 +48,8 @@
             AmmoCapacity = 6;
             AmmoType = AmmunitionType.Cannonballs;
             Location = location;
-            location.Put(this);
+            Owner = owner;
+            location.PutEntity(this);
         }
 
         public void Heal(int heal)

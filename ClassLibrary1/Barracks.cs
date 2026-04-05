@@ -22,7 +22,9 @@
 
         public Cell Location { get; private set; }
 
-        public Barracks(Cell location)
+        public Player Owner { get; private set; }
+
+        public Barracks(Cell location, Player owner)
         {
             MaxHP = 1200;
             HP = 1200;
@@ -34,7 +36,8 @@
             ProductionCost = 2;
             Capacity = 5;
             Location = location;
-            location.Put(this);
+            Owner = owner;
+            location.PutEntity(this);
         }
 
         public void Heal(int heal)
