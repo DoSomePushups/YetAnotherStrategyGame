@@ -2,6 +2,7 @@ using Model;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 using YetAnotherStrategyGame.Views.Controls.Screens;
 
@@ -10,18 +11,19 @@ namespace YetAnotherStrategyGame
     [DesignerCategory("Code")]
     public class MainForm : Form
     {
-        private Game _game;
+        private Game Game;
 
         // Экземпляры экранов
-        private MainScreenControl _mainScreen;
-        private PlayOptionScreenControl _playOptionScreen;
+        private MainScreenControl MainScreen;
+        private PlayOptionScreenControl PlayOptionScreen;
+        private GameScreenControl GameScreen;
 
         public MainForm()
         {
             InitializeComponent();
 
-            _game = new Game();
-            _game.StateChanged += Game_OnStateChanged;
+            Game = new Game();
+            Game.StateChanged += Game_OnStateChanged;
 
             // Настройка экранов и показ начального
             ConfigureScreens();
@@ -37,18 +39,20 @@ namespace YetAnotherStrategyGame
             this.BackColor = Color.FromArgb(190, 225, 150);
 
             // Инициализация контролов экранов
-            _mainScreen = new MainScreenControl();
-            _playOptionScreen = new PlayOptionScreenControl();
+            MainScreen = new MainScreenControl();
+            PlayOptionScreen = new PlayOptionScreenControl();
+            GameScreen = new GameScreenControl();
 
             // Добавление на форму
-            this.Controls.Add(_mainScreen);
-            this.Controls.Add(_playOptionScreen);
+            this.Controls.Add(MainScreen);
+            this.Controls.Add(PlayOptionScreen);
         }
 
         private void ConfigureScreens()
         {
-            _mainScreen.Configure(_game);
-            _playOptionScreen.Configure(_game);
+            MainScreen.Configure(Game);
+            PlayOptionScreen.Configure(Game);
+            GameScreen.Configure(Game);
         }
 
         private void Game_OnStateChanged(GameState state)
@@ -62,21 +66,35 @@ namespace YetAnotherStrategyGame
                 case GameState.PlayOptionScreen:
                     ShowPlayOptionScreen();
                     break;
+                case GameState.GameScreen:
+                    ShowGameScreen();
+                    break;
+
             }
         }
 
         private void ShowMainScreen()
         {
-            _playOptionScreen.Hide();
-            _mainScreen.Show();
-            _mainScreen.BringToFront();
+            PlayOptionScreen.Hide();
+            GameScreen.Hide();
+            MainScreen.Show();
+            MainScreen.BringToFront();
         }
 
         private void ShowPlayOptionScreen()
         {
-            _mainScreen.Hide();
-            _playOptionScreen.Show();
-            _playOptionScreen.BringToFront();
+            MainScreen.Hide();
+            GameScreen.Hide();
+            PlayOptionScreen.Show();
+            PlayOptionScreen.BringToFront();
+        }
+
+        private void ShowGameScreen()
+        {
+            MainScreen.Hide();
+            PlayOptionScreen.Hide();
+            GameScreen.Show();
+            GameScreen.BringToFront();
         }
     }
 }

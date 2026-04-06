@@ -10,7 +10,7 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
     [DesignerCategory("Code")]
     public partial class MainScreenControl : UserControl
     {
-        private Game _game;
+        private Game Game;
         private Label titleLabel;
         private PlayButton playButton;
         private SettingsButton settingsButton;
@@ -52,12 +52,12 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
 
         public void Configure(Game game)
         {
-            _game = game;
+            Game = game;
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
         {
-            _game?.ChangeGameState(GameState.PlayOptionScreen);
+            Game?.ChangeGameState(GameState.PlayOptionScreen);
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -69,8 +69,8 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            int centerX = this.Width / 2;
-            int startY = this.Height / 4;
+            var centerX = this.Width / 2;
+            var startY = this.Height / 4;
 
             titleLabel.Location = new Point(centerX - titleLabel.Width / 2, 50);
             playButton.Location = new Point(centerX - playButton.Width / 2, startY);

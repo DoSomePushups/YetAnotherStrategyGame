@@ -10,7 +10,7 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
     [DesignerCategory("Code")]
     public partial class PlayOptionScreenControl : UserControl
     {
-        private Game _game;
+        private Game Game;
         private Label titleLabel;
         private FreePlayButton freePlayButton;
         private CampaignButton campaignButton;
@@ -40,6 +40,7 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
             backButton = new BackButton();
 
             // Привязка событий
+            freePlayButton.Click += FreePlayButton_Click;
             backButton.Click += BackButton_Click;
             // Остальные кнопки пока ничего не делают
 
@@ -51,12 +52,17 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
 
         public void Configure(Game game)
         {
-            _game = game;
+            Game = game;
+        }
+
+        private void FreePlayButton_Click(object sender, EventArgs e)
+        {
+            Game?.ChangeGameState(GameState.GameScreen);
         }
 
         private void BackButton_Click(object sender, EventArgs e)
         {
-            _game?.ChangeGameState(GameState.MainScreen);
+            Game?.ChangeGameState(GameState.MainScreen);
         }
 
         protected override void OnResize(EventArgs e)

@@ -61,9 +61,11 @@ namespace Tests
         [Test]
         public void CanPlaceMine()
         {
-            var cell = Game.GameField.Map[]
-            var castle = new Castle();
-            Game.GameField.Map[0, 0].
+            var player = Game.FirstPlayer;
+            var map = Game.GameField.Map;
+            player.TryBuild(map[4, 12]);
+            Assert.That(Game.GameField.Map[4, 12].Entity is Farm);
+            Assert.That(Game.GameField.Map[4, 12].Entity.Owner, Is.EqualTo(Game.FirstPlayer));
         }
     }
 }
