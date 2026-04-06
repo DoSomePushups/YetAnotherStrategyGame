@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace Model
 {
     public class CrossbowWorkshop : IProductionBuilding, IAmmunitionBuilding
     {
@@ -51,6 +51,8 @@
             Owner = owner;
             location.PutEntity(this);
         }
+
+        public void PlaceOn(Cell cell) => Location = cell;
 
         public void Heal(int heal)
         {

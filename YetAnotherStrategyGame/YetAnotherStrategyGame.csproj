@@ -9,7 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
+    <PackageReference Include="Svg" Version="3.4.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\Model.csproj" />
   </ItemGroup>
 
 </Project>

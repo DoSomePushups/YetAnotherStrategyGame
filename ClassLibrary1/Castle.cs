@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace Model
 {
     public class Castle : ISpawnBuilding
     {
@@ -31,7 +31,6 @@
             SpawnCost = 10;
             Location = location;
             Owner = owner;
-            location.PutEntity(this);
         }
 
         public void Heal(int heal)

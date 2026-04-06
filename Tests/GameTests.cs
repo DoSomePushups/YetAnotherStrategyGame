@@ -1,4 +1,4 @@
-﻿using ClassLibrary1;
+﻿using Model;
 using NUnit.Framework;
 using FluentAssertions;
 
@@ -37,6 +37,15 @@ namespace Tests
             Assert.That(Game.SecondPlayer.Food, Is.EqualTo(0));
             Assert.That(Game.SecondPlayer.Gold, Is.EqualTo(0));
 
+            Assert.That(Game.GameField.Map[10, 12].X, Is.EqualTo(10));
+            Assert.That(Game.GameField.Map[10, 12].Y, Is.EqualTo(12));
+            Assert.That(Game.GameField.Map[10, 12].Entity, Is.Null);
+
+            Assert.That(Game.GameField.Map[5, 0].Entity is Castle);
+            Assert.That(Game.GameField.Map[5, 12].Entity is Castle);
+            Assert.That(Game.GameField.Map[5, 0].Entity.Owner, Is.EqualTo(Game.SecondPlayer));
+            Assert.That(Game.GameField.Map[5, 12].Entity.Owner, Is.EqualTo(Game.FirstPlayer));
+
             Assert.That(Game.LastPlayerId, Is.EqualTo(2));
         }
 
@@ -47,6 +56,14 @@ namespace Tests
             Assert.That(Game.GameState, Is.EqualTo(GameState.PlayOptionScreen));
             Game.ChangeGameState(GameState.GameScreen);
             Assert.That(Game.GameState, Is.EqualTo(GameState.GameScreen));
+        }
+
+        [Test]
+        public void CanPlaceMine()
+        {
+            var cell = Game.GameField.Map[]
+            var castle = new Castle();
+            Game.GameField.Map[0, 0].
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace Model
 {
     public interface IResourceBuilding : IBuilding
     {

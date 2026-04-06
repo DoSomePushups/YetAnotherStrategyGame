@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace Model
 {
     public class Player
     {
@@ -18,6 +18,8 @@
 
         public int Food { get; private set; }
 
+        public BuildingType SelectedBuilding { get; private set; }
+
         public Player(string name, int id)
         {
             Name = name;
@@ -28,6 +30,28 @@
             OwnedUnits = new HashSet<IUnit>();
             Gold = 0;
             Food = 0;
+            SelectedBuilding = BuildingType.Farm;
+        }
+
+        public void TryBuild(Cell cell)
+        {
+            IBuilding building = SelectedBuilding switch
+            {
+                BuildingType.Farm => new Farm(cell, this),
+                BuildingType.Mine => new Mine(cell, this),
+                BuildingType.Castle => new Castle(cell, this),
+                BuildingType.Barracks => new Barracks(cell, this),
+                BuildingType.CrossbowWorkshop => new CrossbowWorkshop(cell, this),
+                BuildingType.CannonFactory => new CannonFactory(cell, this)
+            };
+            var costGold = building.CostGold;
+            var costFood = building.CostFood;
+            if (Gold >= building.CostGold && Food >= building.CostFood)
+            {
+                Gold -= costGold;
+                Food -= costFood;
+                cell.PutEntity(building);
+            }
         }
     }
 }

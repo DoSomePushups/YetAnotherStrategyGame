@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace Model
 {
     public class Barracks : IProductionBuilding
     {
@@ -37,7 +37,6 @@
             Capacity = 5;
             Location = location;
             Owner = owner;
-            location.PutEntity(this);
         }
 
         public void Heal(int heal)

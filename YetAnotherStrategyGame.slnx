@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="ClassLibrary1/ClassLibrary1.csproj" Id="f780b680-010c-48f4-ae2e-bf1d5bec5ff5" />
+  <Project Path="ClassLibrary1/Model.csproj" Id="f780b680-010c-48f4-ae2e-bf1d5bec5ff5" />
   <Project Path="Tests/Tests.csproj" Id="de9132da-c5d9-4560-841c-6ed9d99afe7d" />
   <Project Path="YetAnotherStrategyGame/YetAnotherStrategyGame.csproj" Id="6f619933-3999-4ede-88c2-f00130302a8e" />
 </Solution>
