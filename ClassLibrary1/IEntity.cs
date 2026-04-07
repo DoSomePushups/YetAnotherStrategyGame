@@ -6,6 +6,8 @@
 
         int HP { get; }
 
+        int UnactionTime { get; }
+
         Cell Location { get; }
 
         Player Owner { get; }

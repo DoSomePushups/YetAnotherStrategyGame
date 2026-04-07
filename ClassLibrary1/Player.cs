@@ -20,6 +20,8 @@
 
         public BuildingType SelectedBuilding { get; private set; }
 
+        public IUnit SelectedUnit { get; private set; }
+
         public Player(string name, int id)
         {
             Name = name;
@@ -28,8 +30,8 @@
             Color = (TeamColor)id;
             OwnedBuildings = new HashSet<IBuilding>();
             OwnedUnits = new HashSet<IUnit>();
-            Gold = 0;
-            Food = 0;
+            Gold = 100;
+            Food = 50;
             SelectedBuilding = BuildingType.Farm;
         }
 
@@ -53,5 +55,7 @@
                 cell.PutEntity(building);
             }
         }
+
+
     }
 }
