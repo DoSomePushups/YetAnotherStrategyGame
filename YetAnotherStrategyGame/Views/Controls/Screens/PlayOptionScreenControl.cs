@@ -16,8 +16,9 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
         private CampaignButton campaignButton;
         private BackButton backButton;
 
-        public PlayOptionScreenControl()
+        public PlayOptionScreenControl(Game game)
         {
+            Game = game;
             InitializeComponent();
         }
 
@@ -48,11 +49,6 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
             this.Controls.Add(freePlayButton);
             this.Controls.Add(campaignButton);
             this.Controls.Add(backButton);
-        }
-
-        public void Configure(Game game)
-        {
-            Game = game;
         }
 
         private void FreePlayButton_Click(object sender, EventArgs e)

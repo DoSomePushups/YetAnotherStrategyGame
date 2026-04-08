@@ -20,13 +20,11 @@ namespace YetAnotherStrategyGame
 
         public MainForm()
         {
-            InitializeComponent();
-
             Game = new Game();
             Game.StateChanged += Game_OnStateChanged;
 
-            // Настройка экранов и показ начального
-            ConfigureScreens();
+            InitializeComponent();
+
             ShowMainScreen();
         }
 
@@ -34,25 +32,20 @@ namespace YetAnotherStrategyGame
         {
             // Базовые настройки окна
             this.Text = "Yet Another Strategy Game";
-            this.Size = new Size(1920, 1080);
-            this.StartPosition = FormStartPosition.CenterScreen;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
+            this.TopMost = true;
             this.BackColor = Color.FromArgb(190, 225, 150);
 
             // Инициализация контролов экранов
-            MainScreen = new MainScreenControl();
-            PlayOptionScreen = new PlayOptionScreenControl();
-            GameScreen = new GameScreenControl();
+            MainScreen = new MainScreenControl(Game);
+            PlayOptionScreen = new PlayOptionScreenControl(Game);
+            GameScreen = new GameScreenControl(Game);
 
             // Добавление на форму
             this.Controls.Add(MainScreen);
             this.Controls.Add(PlayOptionScreen);
-        }
-
-        private void ConfigureScreens()
-        {
-            MainScreen.Configure(Game);
-            PlayOptionScreen.Configure(Game);
-            GameScreen.Configure(Game);
+            this.Controls.Add(GameScreen);
         }
 
         private void Game_OnStateChanged(GameState state)

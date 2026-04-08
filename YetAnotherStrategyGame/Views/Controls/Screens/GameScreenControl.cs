@@ -11,9 +11,11 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
     public partial class GameScreenControl : UserControl
     {
         private Game Game;
+        private FieldControl FieldControl;
 
-        public GameScreenControl()
+        public GameScreenControl(Game game)
         {
+            Game = game;
             InitializeComponent();
         }
 
@@ -21,11 +23,10 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
         {
             this.BackColor = Color.FromArgb(190, 225, 150);
             this.Dock = DockStyle.Fill;
-        }
-
-        public void Configure(Game game)
-        {
-            Game = game;
+            FieldControl = new FieldControl(Game.GameField, 80);
+            FieldControl.Location = new Point(0,0);
+            Controls.Add(FieldControl);
+            FieldControl.BringToFront();
         }
     }
 }

@@ -16,8 +16,9 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
         private SettingsButton settingsButton;
         private ExitButton exitButton;
 
-        public MainScreenControl()
+        public MainScreenControl(Game game)
         {
+            Game = game;
             InitializeComponent();
         }
 
@@ -48,11 +49,6 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
             this.Controls.Add(playButton);
             this.Controls.Add(settingsButton);
             this.Controls.Add(exitButton);
-        }
-
-        public void Configure(Game game)
-        {
-            Game = game;
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
