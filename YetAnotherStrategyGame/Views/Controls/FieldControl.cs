@@ -36,7 +36,8 @@ namespace YetAnotherStrategyGame.Views.Controls
                     var cellButton = new Button();
                     cellButton.Location = new Point(i * CellSize, j * CellSize);
                     cellButton.Size = new Size(CellSize, CellSize);
-                    cellButton.BackColor = Color.Green;
+                    cellButton.BackColor = Color.FromArgb(127, 179, 64);
+                    cellButton.FlatStyle = FlatStyle.Flat;
                     cellButton.Click += (sender, args) =>
                     {
                         MessageBox.Show($"Кликнута кнопка [{x},{y}]");

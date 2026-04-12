@@ -12,6 +12,7 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
     {
         private Game Game;
         private FieldControl FieldControl;
+        private GameMenuControl GameMenuControl;
 
         public GameScreenControl(Game game)
         {
@@ -21,12 +22,14 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
 
         private void InitializeComponent()
         {
-            this.BackColor = Color.FromArgb(190, 225, 150);
+            this.BackColor = Color.FromArgb(63, 77, 45);
             this.Dock = DockStyle.Fill;
             FieldControl = new FieldControl(Game.GameField, 80);
-            FieldControl.Location = new Point(0,0);
+            GameMenuControl = new GameMenuControl(Game);
+            GameMenuControl.Location = new Point(1040, 20);
+            FieldControl.Location = new Point(80,20);
+            Controls.Add(GameMenuControl);
             Controls.Add(FieldControl);
-            FieldControl.BringToFront();
         }
     }
 }
