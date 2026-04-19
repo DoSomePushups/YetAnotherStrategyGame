@@ -1,18 +1,23 @@
 ﻿namespace Model
 {
+    public class HumanInformation : IUnitInformation
+    {
+        public static int MaxHP { get; } = 50;
+
+        public static int Damage { get; } = 10;
+
+        public static UnitType Type { get; } = UnitType.Melee;
+
+        public static int AttackCD { get; } = 2;
+
+        public static int MoveCD { get; } = 3;
+    }
+
     public class Human : IUnit
     {
-        public int MaxHP { get; private set; }
-
         public int HP { get; private set; }
 
-        public int Damage { get; private set; }
-
-        public UnitType Type { get; private set; }
-
-        public int AttackCD { get; private set; }
-
-        public int MoveCD { get; private set; }
+        public int UnactionTime { get; private set; }
 
         public Cell Location { get; private set; }
 
@@ -20,12 +25,7 @@
 
         public Human(Cell location, Player owner)
         {
-            MaxHP = 50;
             HP = 50;
-            Damage = 10;
-            Type = UnitType.Melee;
-            AttackCD = 2;
-            MoveCD = 3;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -34,10 +34,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = HumanInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)
@@ -60,7 +61,7 @@
             if (entity == null)
                 this.MoveTo(actionObject);
             else if (entity.Owner.Team != actionObject.Entity.Owner.Team)
-                actionObject.Entity.TakeDamage(Damage);
+                actionObject.Entity.TakeDamage(HumanInformation.Damage);
             else if (entity.Owner.Team == actionObject.Entity.Owner.Team)
             {
                 if (entity is Barracks)

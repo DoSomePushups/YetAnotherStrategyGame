@@ -1,43 +1,40 @@
 ﻿namespace Model
 {
+    public class CrossbowmanInformation : IRangedUnitInformation
+    {
+        public static int MaxHP { get; } = 100;
+
+        public static int Range { get; } = 2;
+
+        public static int Damage { get; } = 34;
+
+        public static UnitType Type { get; } = UnitType.Ranged;
+
+        public static AmmunitionType AmmoType { get; } = AmmunitionType.Arrows;
+
+        public static int Capacity { get; } = 6;
+
+        public static int AttackCD { get; } = 4;
+
+        public static int MoveCD { get; } = 4;
+    }
+
     public class Crossbowman : IRangedUnit
     {
-        public int MaxHP { get; private set; }
-
         public int HP { get; private set; }
-
-        public int Range { get; private set; }
-
-        public int Damage { get; private set; }
-
-        public UnitType Type { get; private set; }
-
-        public AmmunitionType AmmoType { get; private set; }
 
         public int AmmoLeft { get; private set; }
 
-        public int Capacity { get; private set; }
+        public int UnactionTime { get; private set; }
 
-        public int AttackCD { get; private set; }
-
-        public int MoveCD { get; private set; }
-        
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
         public Crossbowman(Cell location, Player owner)
         {
-            MaxHP = 100;
             HP = 100;
-            Range = 2;
-            Damage = 34;
-            Type = UnitType.Ranged;
-            AmmoType = AmmunitionType.Arrows;
-            AttackCD = 4;
-            MoveCD = 4;
             AmmoLeft = 0;
-            Capacity = 6;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -46,10 +43,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = CrossbowmanInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)
@@ -69,10 +67,10 @@
             var distance = Location.GetDistance(actionObject);
             if (entity == null && distance == 1)
                 this.MoveTo(actionObject);
-            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= Range)
+            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CrossbowmanInformation.Range)
             {
                     AmmoLeft--;
-                    actionObject.Entity.TakeDamage(Damage);
+                    actionObject.Entity.TakeDamage(CrossbowmanInformation.Damage);
             }
         }
     }

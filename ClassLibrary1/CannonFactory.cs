@@ -1,32 +1,37 @@
 ﻿namespace Model
 {
+    public class CannonFactoryInformation : IProductionBuildingInformation, IAmmunitionBuildingInformation
+    {
+        public static int MaxHP { get; } = 1800;
+
+        public static int CostGold { get; } = 80;
+
+        public static int CostFood { get; } = 0;
+
+        public static int BuildTime { get; } = 50;
+
+        public static Equipment EquipmentType { get; } = Equipment.Cannon;
+
+        public static int ProductionTime { get; } = 30;
+
+        public static int ProductionCost { get; } = 15;
+
+        public static int Capacity { get; } = 3;
+
+        public static int AmmoProductionTime { get; } = 10;
+
+        public static int AmmoCost { get; } = 5;
+
+        public static int AmmoCapacity { get; } = 6;
+
+        public static AmmunitionType AmmoType { get; } = AmmunitionType.Cannonballs;
+    }
+
     public class CannonFactory : IProductionBuilding, IAmmunitionBuilding
     {
-        public int MaxHP { get; private set; }
+        public int HP { get; private set; }
 
-        public int HP { get; private set; } = 1800;
-
-        public int CostGold { get; private set; } = 80;
-
-        public int CostFood { get; private set; } = 0;
-
-        public int BuildTime { get; private set; } = 50;
-
-        public Equipment EquipmentType { get; private set; } = Equipment.Cannon;
-
-        public int ProductionTime { get; private set; } = 30;
-
-        public int ProductionCost { get; private set; } = 15;
-
-        public int Capacity { get; private set; } = 3;
-
-        public int AmmoProductionTime { get; private set; } = 10;
-
-        public int AmmoCost { get; private set; } = 5;
-
-        public int AmmoCapacity { get; private set; } = 6;
-
-        public AmmunitionType AmmoType { get; private set; } = AmmunitionType.Cannonballs;
+        public int UnactionTime { get; private set; }
 
         public Cell Location {  get; private set; }
 
@@ -34,19 +39,8 @@
 
         public CannonFactory(Cell location, Player owner)
         {
-            MaxHP = 1800;
             HP = 1800;
-            CostGold = 80;
-            CostFood = 0;
-            BuildTime = 50;
-            EquipmentType = Equipment.Cannon;
-            ProductionTime = 30;
-            ProductionCost = 15;
-            Capacity = 3;
-            AmmoProductionTime = 10;
-            AmmoCost = 5;
-            AmmoCapacity = 6;
-            AmmoType = AmmunitionType.Cannonballs;
+            UnactionTime = 0;
             Location = location;
             Owner = owner;
         }
@@ -56,10 +50,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = CannonFactoryInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)

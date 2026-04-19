@@ -17,55 +17,61 @@ namespace Tests
         [Test]
         public void DefaultGameInicialization()
         {
-            Assert.That(Game.GameState, Is.EqualTo(GameState.MainScreen));
+            Game.Start(11, 13);
+            var session = Game.Session;
+            var firstPlayer = session.FirstPlayer;
+            var secondPlayer = session.SecondPlayer;
+            var field = session.GameField;
+            Assert.That(Game.State, Is.EqualTo(GameState.MainScreen));
 
-            Assert.That(Game.FirstPlayer.Name, Is.EqualTo("User"));
-            Assert.That(Game.FirstPlayer.Id, Is.EqualTo(1));
-            Assert.That(Game.FirstPlayer.Team, Is.EqualTo(Team.First));
-            Assert.That(Game.FirstPlayer.Color, Is.EqualTo(TeamColor.Blue));
-            Assert.That(Game.FirstPlayer.OwnedBuildings, Is.Empty);
-            Assert.That(Game.FirstPlayer.OwnedUnits, Is.Empty);
-            Assert.That(Game.FirstPlayer.Food, Is.EqualTo(0));
-            Assert.That(Game.FirstPlayer.Gold, Is.EqualTo(0));
+            Assert.That(session.FirstPlayer.Name, Is.EqualTo("User"));
+            Assert.That(firstPlayer.Id, Is.EqualTo(1));
+            Assert.That(firstPlayer.Team, Is.EqualTo(Team.First));
+            Assert.That(firstPlayer.Color, Is.EqualTo(TeamColor.Blue));
+            Assert.That(firstPlayer.OwnedBuildings, Is.Empty);
+            Assert.That(firstPlayer.OwnedUnits, Is.Empty);
+            Assert.That(firstPlayer.Food, Is.EqualTo(50));
+            Assert.That(firstPlayer.Gold, Is.EqualTo(100));
 
-            Assert.That(Game.SecondPlayer.Name, Is.EqualTo("AI"));
-            Assert.That(Game.SecondPlayer.Id, Is.EqualTo(2));
-            Assert.That(Game.SecondPlayer.Team, Is.EqualTo(Team.Second));
-            Assert.That(Game.SecondPlayer.Color, Is.EqualTo(TeamColor.Red));
-            Assert.That(Game.SecondPlayer.OwnedBuildings, Is.Empty);
-            Assert.That(Game.SecondPlayer.OwnedUnits, Is.Empty);
-            Assert.That(Game.SecondPlayer.Food, Is.EqualTo(0));
-            Assert.That(Game.SecondPlayer.Gold, Is.EqualTo(0));
+            Assert.That(secondPlayer.Name, Is.EqualTo("AI"));
+            Assert.That(secondPlayer.Id, Is.EqualTo(2));
+            Assert.That(secondPlayer.Team, Is.EqualTo(Team.Second));
+            Assert.That(secondPlayer.Color, Is.EqualTo(TeamColor.Red));
+            Assert.That(secondPlayer.OwnedBuildings, Is.Empty);
+            Assert.That(secondPlayer.OwnedUnits, Is.Empty);
+            Assert.That(secondPlayer.Food, Is.EqualTo(50));
+            Assert.That(secondPlayer.Gold, Is.EqualTo(100));
 
-            Assert.That(Game.GameField.Map[10, 12].X, Is.EqualTo(10));
-            Assert.That(Game.GameField.Map[10, 12].Y, Is.EqualTo(12));
-            Assert.That(Game.GameField.Map[10, 12].Entity, Is.Null);
+            Assert.That(field.Map[10, 12].X, Is.EqualTo(10));
+            Assert.That(field.Map[10, 12].Y, Is.EqualTo(12));
+            Assert.That(field.Map[10, 12].Entity, Is.Null);
 
-            Assert.That(Game.GameField.Map[5, 0].Entity is Castle);
-            Assert.That(Game.GameField.Map[5, 12].Entity is Castle);
-            Assert.That(Game.GameField.Map[5, 0].Entity.Owner, Is.EqualTo(Game.SecondPlayer));
-            Assert.That(Game.GameField.Map[5, 12].Entity.Owner, Is.EqualTo(Game.FirstPlayer));
+            Assert.That(field.Map[5, 0].Entity is Castle);
+            Assert.That(field.Map[5, 12].Entity is Castle);
+            Assert.That(field.Map[5, 0].Entity.Owner, Is.EqualTo(secondPlayer));
+            Assert.That(field.Map[5, 12].Entity.Owner, Is.EqualTo(firstPlayer));
 
-            Assert.That(Game.LastPlayerId, Is.EqualTo(2));
+            Assert.That(session.LastPlayerId, Is.EqualTo(2));
         }
 
         [Test]
         public void GameStateChanges()
         {
             Game.ChangeGameState(GameState.PlayOptionScreen);
-            Assert.That(Game.GameState, Is.EqualTo(GameState.PlayOptionScreen));
+            Assert.That(Game.State, Is.EqualTo(GameState.PlayOptionScreen));
             Game.ChangeGameState(GameState.GameScreen);
-            Assert.That(Game.GameState, Is.EqualTo(GameState.GameScreen));
+            Assert.That(Game.State, Is.EqualTo(GameState.GameScreen));
         }
 
         [Test]
         public void CanPlaceMine()
         {
-            var player = Game.FirstPlayer;
-            var map = Game.GameField.Map;
+            Game.Start(11, 13);
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
             player.TryBuild(map[4, 12]);
-            Assert.That(Game.GameField.Map[4, 12].Entity is Farm);
-            Assert.That(Game.GameField.Map[4, 12].Entity.Owner, Is.EqualTo(Game.FirstPlayer));
+            Assert.That(map[4, 12].Entity is Farm);
+            Assert.That(map[4, 12].Entity.Owner, Is.EqualTo(player));
         }
     }
 }

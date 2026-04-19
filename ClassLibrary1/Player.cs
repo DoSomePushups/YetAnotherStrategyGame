@@ -2,6 +2,8 @@
 {
     public class Player
     {
+        public Game Game { get; }
+
         public string Name { get; private set; }
 
         public int Id { get; private set; }
@@ -20,7 +22,7 @@
 
         public BuildingType SelectedBuilding { get; private set; }
 
-        public IUnit SelectedUnit { get; private set; }
+        public IUnit? SelectedUnit { get; private set; }
 
         public Player(string name, int id)
         {
@@ -35,27 +37,52 @@
             SelectedBuilding = BuildingType.Farm;
         }
 
+        public void Click(Cell cell)
+        {
+            var entity = cell.Entity;
+            if (SelectedUnit != null)
+            {
+                SelectedUnit.ActUpon(cell);
+                SelectedUnit = null;
+            }
+            else if (entity == null)
+                TryBuild(cell);
+            else
+            {
+                //Начать производить в здании
+                throw new NotImplementedException();
+            }
+        }
+        public void Select(Cell cell)
+        {
+            var entity = cell.Entity;
+            if (entity is IUnit && entity.Owner == this)
+                SelectedUnit = (IUnit)entity;
+            else
+                SelectedUnit = null;
+        }
+
         public void TryBuild(Cell cell)
         {
-            IBuilding building = SelectedBuilding switch
+            var buildingData = SelectedBuilding switch
             {
-                BuildingType.Farm => new Farm(cell, this),
-                BuildingType.Mine => new Mine(cell, this),
-                BuildingType.Castle => new Castle(cell, this),
-                BuildingType.Barracks => new Barracks(cell, this),
-                BuildingType.CrossbowWorkshop => new CrossbowWorkshop(cell, this),
-                BuildingType.CannonFactory => new CannonFactory(cell, this)
+                BuildingType.Farm => (FarmInformation.CostGold, FarmInformation.CostFood, (Func<IBuilding>)(() => new Farm(cell, this))),
+                BuildingType.Mine => (MineInformation.CostGold, MineInformation.CostFood, () => new Mine(cell, this)),
+                BuildingType.Castle => (CastleInformation.CostGold, CastleInformation.CostFood, () => new Castle(cell, this)),
+                BuildingType.Barracks => (BarracksInformation.CostGold, BarracksInformation.CostFood, () => new Barracks(cell, this)),
+                BuildingType.CrossbowWorkshop => (CrossbowWorkshopInformation.CostGold, CrossbowWorkshopInformation.CostFood, () => new CrossbowWorkshop(cell, this)),
+                BuildingType.CannonFactory => (CannonFactoryInformation.CostGold, CannonFactoryInformation.CostFood, () => new CannonFactory(cell, this)),
+                _ => throw new ArgumentOutOfRangeException(nameof(SelectedBuilding), $"Тип {SelectedBuilding} не поддерживается")
             };
-            var costGold = building.CostGold;
-            var costFood = building.CostFood;
-            if (Gold >= building.CostGold && Food >= building.CostFood)
+            var (costGold, costFood, createBuilding) = buildingData;
+            if (Gold >= costGold && Food >= costFood)
             {
                 Gold -= costGold;
                 Food -= costFood;
-                cell.PutEntity(building);
+                cell.PutEntity(createBuilding());
             }
         }
 
-
+        public void BuySpawn(int spawnCost) => Food -= spawnCost;
     }
 }

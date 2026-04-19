@@ -1,26 +1,31 @@
 ﻿namespace Model
 {
+    public class CannonInformation : IRangedUnitInformation
+    {
+        public static int MaxHP { get; } = 50;
+
+        public static int Range { get; } = 3;
+
+        public static int Damage { get; } = 600;
+
+        public static UnitType Type { get; } = UnitType.Ranged;
+
+        public static AmmunitionType AmmoType { get; } = AmmunitionType.Cannonballs;
+
+        public static int Capacity { get; } = 2;
+
+        public static int AttackCD { get; } = 15;
+
+        public static int MoveCD { get; } = 8;
+    }
+
     public class Cannon : IRangedUnit
     {
-        public int MaxHP { get; private set; }
-
         public int HP { get; private set; }
-
-        public int Range { get; private set; }
-
-        public int Damage { get; private set; }
-
-        public UnitType Type { get; private set; }
-
-        public AmmunitionType AmmoType { get; private set; }
 
         public int AmmoLeft { get; private set; }
 
-        public int Capacity { get; private set; }
-
-        public int AttackCD { get; private set; }
-
-        public int MoveCD { get; private set; }
+        public int UnactionTime { get; private set; }
         
         public Cell Location { get; private set; }
 
@@ -28,16 +33,9 @@
 
         public Cannon(Cell location, Player owner)
         {
-            MaxHP = 50;
             HP = 50;
-            Range = 3;
-            Damage = 600;
-            Type = UnitType.Ranged;
-            AmmoType = AmmunitionType.Cannonballs;
-            AttackCD = 15;
-            MoveCD = 8;
             AmmoLeft = 0;
-            Capacity = 2;
+            UnactionTime = 0;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -46,10 +44,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = CannonInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)
@@ -69,10 +68,10 @@
             var distance = Location.GetDistance(actionObject);
             if (entity == null && distance == 1)
                 this.MoveTo(actionObject);
-            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= Range)
+            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CannonInformation.Range)
             {
                     AmmoLeft--;
-                    actionObject.Entity.TakeDamage(Damage);
+                    actionObject.Entity.TakeDamage(CannonInformation.Damage);
             }
         }
     }

@@ -1,9 +1,14 @@
 ﻿namespace Model
 {
+    public interface ISpawnBuildingInformation : IBuildingInformation
+    {
+        static abstract int SpawnTime { get; }
+
+        static abstract int SpawnCost { get; }
+    }
+
     public interface ISpawnBuilding : IBuilding
     {
-        int SpawnTime { get; }
-
-        int SpawnCost { get; }
+        public void TrySpawn();
     }
 }

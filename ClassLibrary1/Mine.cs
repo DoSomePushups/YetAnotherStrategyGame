@@ -1,20 +1,25 @@
 ﻿namespace Model
 {
+    public class MineInformation : IResourceBuildingInformation
+    {
+        public static int MaxHP { get; } = 800;
+
+        public static int CostGold { get; } = 10;
+
+        public static int CostFood { get; } = 0;
+
+        public static int BuildTime { get; } = 20;
+
+        public static int PassiveProductionTime { get; } = 6;
+
+        public static PassiveResourceType PassiveResourceType { get; } = PassiveResourceType.Gold;
+    }
+
     public class Mine : IResourceBuilding
     {
-        public int MaxHP { get; private set; }
-
         public int HP { get; private set; }
 
-        public int CostGold { get; private set; }
-
-        public int CostFood { get; private set; }
-
-        public int BuildTime { get; private set; }
-
-        public int PassiveProductionTime { get; private set; }
-
-        public PassiveResourceType PassiveResourceType { get; private set; }
+        public int UnactionTime { get; private set; }
 
         public Cell Location { get; private set; }
 
@@ -22,13 +27,7 @@
 
         public Mine(Cell location, Player owner)
         {
-            MaxHP = 800;
             HP = 800;
-            CostGold = 10;
-            CostFood = 0;
-            BuildTime = 20;
-            PassiveProductionTime = 6;
-            PassiveResourceType = PassiveResourceType.Gold;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -37,10 +36,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = MineInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else 
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)

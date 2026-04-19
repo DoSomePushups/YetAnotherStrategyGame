@@ -1,18 +1,24 @@
 ﻿namespace Model
 {
+    public class WarriorInformation : IUnitInformation
+    {
+        public static int MaxHP { get; } = 150;
+
+        public static int Damage { get; } = 50;
+
+        public static UnitType Type { get; } = UnitType.Melee;
+
+        public static int AttackCD { get; } = 3;
+
+        public static int MoveCD { get; } = 5;
+
+    }
+
     public class Warrior : IUnit
     {
-        public int MaxHP { get; private set; }
-
         public int HP { get; private set; }
 
-        public int Damage { get; private set; }
-
-        public UnitType Type { get; private set; }
-
-        public int AttackCD { get; private set; }
-
-        public int MoveCD { get; private set; }
+        public int UnactionTime { get; private set; }
 
         public Cell Location { get; private set; }
 
@@ -20,12 +26,7 @@
 
         public Warrior(Cell location, Player owner)
         {
-            MaxHP = 150;
             HP = 150;
-            Damage = 50;
-            Type = UnitType.Melee;
-            AttackCD = 3;
-            MoveCD = 5;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -34,10 +35,11 @@
         public void Heal(int heal)
         {
             var newHealth = HP + heal;
-            if (newHealth < MaxHP)
+            var maxHP = WarriorInformation.MaxHP;
+            if (newHealth < maxHP)
                 HP = newHealth;
             else
-                HP = MaxHP;
+                HP = maxHP;
         }
 
         public void TakeDamage(int damage)
@@ -60,7 +62,7 @@
             if (entity == null)
                 this.MoveTo(actionObject);
             else if (entity.Owner.Team != actionObject.Entity.Owner.Team)
-                actionObject.Entity.TakeDamage(Damage);
+                actionObject.Entity.TakeDamage(WarriorInformation.Damage);
         }
     }
 }

@@ -1,15 +1,18 @@
 ﻿namespace Model
 {
+    public interface IUnitInformation : IEntityInformation
+    {
+        static abstract int Damage { get; }
+
+        static abstract UnitType Type { get; }
+
+        static abstract int AttackCD { get; }
+
+        static abstract int MoveCD { get; }
+    }
+
     public interface IUnit : IEntity
     {
-        int Damage { get; }
-
-        UnitType Type { get; }
-
-        int AttackCD { get; }
-
-        int MoveCD { get; }
-
         public void ActUpon(Cell actionObject);
     }
 }

@@ -1,9 +1,13 @@
 ﻿namespace Model
 {
+
+    public interface IEntityInformation
+    {
+        static abstract int MaxHP { get; }
+    }
+
     public interface IEntity
     {
-        int MaxHP { get; }
-
         int HP { get; }
 
         int UnactionTime { get; }
