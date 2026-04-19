@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using YetAnotherStrategyGame.Views.Controls;
+using Model;
 
 namespace YetAnotherStrategyGame.Views.Controls.Screens
 {
@@ -22,9 +23,10 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
 
         private void InitializeComponent()
         {
+            Game.Start(11, 13);
             this.BackColor = Color.FromArgb(63, 77, 45);
             this.Dock = DockStyle.Fill;
-            FieldControl = new FieldControl(Game.GameField, 80);
+            FieldControl = new FieldControl(Game, 80);
             GameMenuControl = new GameMenuControl(Game);
             GameMenuControl.Location = new Point(1040, 20);
             FieldControl.Location = new Point(80,20);
