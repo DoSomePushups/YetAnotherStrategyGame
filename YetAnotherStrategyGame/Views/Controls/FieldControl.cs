@@ -18,9 +18,9 @@ namespace YetAnotherStrategyGame.Views.Controls
         private Field Field;
         private int CellSize;
 
-        public FieldControl(Game Game, int cellSize)
+        public FieldControl(Game game, int cellSize)
         {
-            Game = Game;
+            Game = game;
             Field = Game.Session.GameField;
             CellSize = cellSize;
             InitializeComponent();
@@ -42,28 +42,41 @@ namespace YetAnotherStrategyGame.Views.Controls
                     cellButton.Size = new Size(CellSize, CellSize);
                     cellButton.BackColor = Color.FromArgb(127, 179, 64);
                     cellButton.FlatStyle = FlatStyle.Flat;
-                    var svgPath = cell.Entity switch
+                    DrawButtonSvg(cell, cellButton);
+                    cell.CellChanged += (updatedCell) =>
                     {
-                        Farm => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "farm.svg"),
-                        Mine => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "GoldMine.svg"),
-                        Castle => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "castle.svg"),
-                        Barracks => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "SwordBarracks.svg"),
-                        CrossbowWorkshop => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "CrossbowBarracks.svg"),
-                        CannonFactory => Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "CannonFactory.svg"),
-                        _ => null
+                        // Cлучай, если изменения придут из другого потока
+                        if (cellButton.InvokeRequired)
+                            cellButton.Invoke(new Action(() => DrawButtonSvg(updatedCell, cellButton)));
+                        else
+                            DrawButtonSvg(updatedCell, cellButton);
                     };
-                    if (svgPath != null)
-                    {
-                        cellButton.Image = SvgDocument.Open(svgPath).Draw(80, 80);
-                        if (cell.Entity.Owner.Team == Team.Second)
-                            cellButton.BackColor = Color.FromArgb(100, 255, 0, 0);
-                    }
                     cellButton.Click += (sender, args) =>
-                    {
                         Game.Session.FirstPlayer.Click(cell);
-                    };
                     Controls.Add(cellButton);
                 }
+            }
+        }
+
+        private void DrawButtonSvg(Cell cell, Button cellButton)
+        {
+            var svgName = cell.Entity switch
+            {
+                Farm => "farm.svg",
+                Mine => "GoldMine.svg",
+                Castle => "castle.svg",
+                Barracks => "SwordBarracks.svg",
+                CrossbowWorkshop => "CrossbowBarracks.svg",
+                CannonFactory => "CannonFactory.svg",
+                Human => "Human.svg",
+                _ => null
+            };
+            var svgPath = svgName != null ? Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", svgName) : null;
+            if (svgPath != null)
+            {
+                cellButton.Image = SvgDocument.Open(svgPath).Draw(80, 80);
+                if (cell.Entity.Owner.Team == Team.Second)
+                    cellButton.BackColor = Color.FromArgb(100, 255, 0, 0);
             }
         }
     }

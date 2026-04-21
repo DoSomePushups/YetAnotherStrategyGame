@@ -54,12 +54,26 @@
 
         public void TrySpawn()
         {
-            var spawnPlace = Owner.Game.Session.GameField.Map[Location.X + 1, Location.Y];
+            var spawnPoints = new List<Cell>(8);
+            var field = Owner.GameSession.GameField;
+            for (var i = -1; i <= 1; i++)
+                for (var j = -1; j <= 1; j++)
+                {
+                    var x = Location.X + i;
+                    var y = Location.Y + j;
+                    if (field.CheckCellExist(x, y))
+                    {
+                        var cell = field.Map[x, y];
+                        if (cell.IsEmpty)
+                            spawnPoints.Add(cell);
+                    }
+                }
+            var spawnPoint = spawnPoints.FirstOrDefault();
             var spawnCost = CastleInformation.SpawnCost;
-            if (Owner.Food >= spawnCost && spawnPlace.Entity == null)
+            if (spawnPoint != null && Owner.Food >= spawnCost)
             {
                 Owner.BuySpawn(spawnCost);
-                spawnPlace.PutEntity(new Human(spawnPlace, Owner));
+                spawnPoint.PutEntity(new Human(spawnPoint, Owner));
             }
         }
 

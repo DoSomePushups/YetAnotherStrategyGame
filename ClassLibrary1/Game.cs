@@ -44,8 +44,8 @@ namespace Model
             public GameSession(int fieldWidth, int fieldHeight)
             {
                 LastPlayerId = 0;
-                FirstPlayer = new Player("User", ++LastPlayerId);
-                SecondPlayer = new Player("AI", ++LastPlayerId);
+                FirstPlayer = new Player(this, "User", ++LastPlayerId);
+                SecondPlayer = new Player(this, "AI", ++LastPlayerId);
                 GameField = new Field(fieldWidth, fieldHeight);
                 var startCell1 = GameField.Map[fieldWidth / 2, fieldHeight - 1];
                 var startCell2 = GameField.Map[fieldWidth / 2, 0];

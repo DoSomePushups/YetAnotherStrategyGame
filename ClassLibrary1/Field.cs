@@ -2,7 +2,7 @@
 {
     public class Field
     {
-        public int Width {  get; private set; }
+        public int Width { get; private set; }
 
         public int Height { get; private set; }
 
@@ -13,9 +13,11 @@
             Width = width;
             Height = height;
             Map = new Cell[width, height];
-            for (var  i = 0; i < width; i++) 
+            for (var i = 0; i < width; i++)
                 for (var j = 0; j < height; j++)
-                    Map[i,j] = new Cell(i, j);
+                    Map[i, j] = new Cell(i, j);
         }
+
+        public bool CheckCellExist(int x, int y) => (x < Width && x >= 0 && y < Height && y >= 0);
     }
 }

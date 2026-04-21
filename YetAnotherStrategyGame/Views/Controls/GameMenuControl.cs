@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Media;
 using System.Text;
 using System.Windows.Forms;
 using Model;
@@ -15,10 +16,12 @@ namespace YetAnotherStrategyGame.Views.Controls
     public partial class GameMenuControl : UserControl
     {
         private Game Game;
+        private Player Player;
 
         public GameMenuControl(Game game)
         {
             Game = game;
+            Player = Game.Session.FirstPlayer;
             InitializeComponent();
         }
 
@@ -26,12 +29,17 @@ namespace YetAnotherStrategyGame.Views.Controls
         {
             Size = new Size(832, 1040);
             var stats = new Stats();
-            stats.Food.Quantity.Text = Game.Session.FirstPlayer.Food.ToString();
-            stats.Gold.Quantity.Text = Game.Session.FirstPlayer.Gold.ToString();
+            stats.Food.Quantity.Text = Player.Food.ToString();
+            stats.Gold.Quantity.Text = Player.Gold.ToString();
+            Player.StatsChanged += (newGold, newFood) =>
+            {
+                stats.Food.Quantity.Text = Player.Food.ToString();
+                stats.Gold.Quantity.Text = Player.Gold.ToString();
+            };
             Game.Session.OnTick += () =>
                 stats.Time.Quantity.Text = (Game.Session.Time / 10).ToString();
             stats.Location = new Point(0, 0);
-            var store = new Store();
+            var store = new Store(Player);
             store.Location = new Point(62, 273);
             store.Items[0].PriceLabelFood.Quantity.Text = FarmInformation.CostFood.ToString();
             store.Items[0].PriceLabelGold.Quantity.Text = FarmInformation.CostGold.ToString();
@@ -103,7 +111,7 @@ namespace YetAnotherStrategyGame.Views.Controls
 
             public StoreItemControl[] Items;
 
-            public Store()
+            public Store(Player player)
             {
                 Size = new Size(708, 560);
                 Items = new StoreItemControl[6];
@@ -112,6 +120,20 @@ namespace YetAnotherStrategyGame.Views.Controls
                     {
                         var index = 2 * i + j;
                         Items[index] = new StoreItemControl(svgPaths[index]);
+                        Items[index].ActionButton.Click += (s, e) =>
+                        {
+                            BuildingType? item = index switch
+                            {
+                                0 => BuildingType.Farm,
+                                1 => BuildingType.Barracks,
+                                2 => BuildingType.Mine,
+                                3 => BuildingType.CrossbowWorkshop,
+                                4 => BuildingType.Castle,
+                                5 => BuildingType.CannonFactory,
+                                _ => null
+                            };
+                            player.SelectStoreItem(item);
+                        };
                         var item = Items[index];
                         item.Location = new Point(i * 264, j * (65 + item.Height));
                         Controls.Add(item);

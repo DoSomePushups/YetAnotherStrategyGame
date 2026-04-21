@@ -12,12 +12,12 @@ namespace Tests
         public void Setup()
         {
             Game = new Game();
+            Game.Start(11, 13);
         }
 
         [Test]
         public void DefaultGameInicialization()
         {
-            Game.Start(11, 13);
             var session = Game.Session;
             var firstPlayer = session.FirstPlayer;
             var secondPlayer = session.SecondPlayer;
@@ -66,12 +66,22 @@ namespace Tests
         [Test]
         public void CanPlaceMine()
         {
-            Game.Start(11, 13);
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.TryBuild(map[4, 12]);
-            Assert.That(map[4, 12].Entity is Farm);
+            player.SelectStoreItem(BuildingType.Mine);
+            player.Click(map[4, 12]);
+            Assert.That(map[4, 12].Entity is Mine);
             Assert.That(map[4, 12].Entity.Owner, Is.EqualTo(player));
+        }
+
+        [Test]
+        public void CanSpawnHuman()
+        {
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
+            player.Click(map[5, 12]);
+            Assert.That(map[6, 12].Entity is Human);
+            Assert.That(map[6, 12].Entity.Owner, Is.EqualTo(player));
         }
     }
 }

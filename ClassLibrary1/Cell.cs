@@ -6,17 +6,23 @@
 
         public readonly int Y;
 
-        public IEntity? Entity { get; private set; } = null;
+        public IEntity? Entity { get; private set; }
+
+        public event Action<Cell> CellChanged;
 
         public bool IsEmpty => Entity == null;
 
-        public Cell (int x, int y)
+        public Cell(int x, int y)
         {
             X = x;
             Y = y;
+            Entity = null;
         }
 
-        public void PutEntity(IEntity entity) => Entity = entity;
+        public void PutEntity(IEntity entity) {
+            Entity = entity;
+            CellChanged?.Invoke(this);
+        }
 
         public void RemoveEntity() => Entity = null;
 

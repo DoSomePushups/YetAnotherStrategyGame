@@ -2,7 +2,7 @@
 {
     public class Player
     {
-        public Game Game { get; }
+        public Game.GameSession GameSession { get; }
 
         public string Name { get; private set; }
 
@@ -20,12 +20,15 @@
 
         public int Food { get; private set; }
 
-        public BuildingType SelectedBuilding { get; private set; }
+        public Action<int, int> StatsChanged;
+
+        public BuildingType? SelectedBuilding { get; private set; }
 
         public IUnit? SelectedUnit { get; private set; }
 
-        public Player(string name, int id)
+        public Player(Game.GameSession session, string name, int id)
         {
+            GameSession = session;
             Name = name;
             Id = id;
             Team = (Team)id;
@@ -34,25 +37,37 @@
             OwnedUnits = new HashSet<IUnit>();
             Gold = 100;
             Food = 50;
-            SelectedBuilding = BuildingType.Farm;
+            SelectedBuilding = null;
         }
 
         public void Click(Cell cell)
         {
             var entity = cell.Entity;
+            var owner = entity?.Owner;
             if (SelectedUnit != null)
             {
                 SelectedUnit.ActUpon(cell);
                 SelectedUnit = null;
             }
-            else if (entity == null)
+            else if (entity == null && SelectedBuilding != null)
                 TryBuild(cell);
+            else if (entity is ISpawnBuilding spawnBuilding)
+                spawnBuilding.TrySpawn();
             else
             {
                 //Начать производить в здании
                 throw new NotImplementedException();
             }
         }
+
+        public void SelectStoreItem(BuildingType? buildingType)
+        {
+            if (SelectedBuilding != buildingType)
+                SelectedBuilding = buildingType;
+            else
+                SelectedBuilding = null;
+        }
+
         public void Select(Cell cell)
         {
             var entity = cell.Entity;
@@ -79,10 +94,15 @@
             {
                 Gold -= costGold;
                 Food -= costFood;
+                StatsChanged?.Invoke(Food, Gold);
                 cell.PutEntity(createBuilding());
             }
         }
 
-        public void BuySpawn(int spawnCost) => Food -= spawnCost;
+        public void BuySpawn(int spawnCost)
+        {
+            Food -= spawnCost;
+            StatsChanged?.Invoke(Food, Gold);
+        }
     }
 }
