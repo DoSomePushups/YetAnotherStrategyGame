@@ -31,10 +31,12 @@
 
         public Player Owner { get; private set; }
 
+        public event Action<Cell> HpChanged;
+
         public Cannon(Cell location, Player owner)
         {
             HP = 50;
-            AmmoLeft = 0;
+            AmmoLeft = 1;
             UnactionTime = 0;
             Location = location;
             Owner = owner;
@@ -54,13 +56,19 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
+            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }
 
         public void Die() => Location.RemoveEntity();
 
-        private void MoveTo(Cell location) => Location = location;
+        private void MoveTo(Cell location)
+        {
+            Location.RemoveEntity();
+            Location = location;
+            Location.PutEntity(this);
+        }
 
         public void ActUpon(Cell actionObject)
         {
@@ -68,7 +76,7 @@
             var distance = Location.GetDistance(actionObject);
             if (entity == null && distance == 1)
                 this.MoveTo(actionObject);
-            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CannonInformation.Range)
+            else if (entity != null && this.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CannonInformation.Range)
             {
                     AmmoLeft--;
                     actionObject.Entity.TakeDamage(CannonInformation.Damage);

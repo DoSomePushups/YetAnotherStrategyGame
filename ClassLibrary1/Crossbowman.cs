@@ -31,10 +31,12 @@
 
         public Player Owner { get; private set; }
 
+        public event Action<Cell> HpChanged;
+
         public Crossbowman(Cell location, Player owner)
         {
             HP = 100;
-            AmmoLeft = 0;
+            AmmoLeft = 1;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -53,13 +55,19 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
+            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }
 
         public void Die() => Location.RemoveEntity();
 
-        private void MoveTo(Cell location) => Location = location;
+        private void MoveTo(Cell location)
+        {
+            Location.RemoveEntity();
+            Location = location;
+            Location.PutEntity(this);
+        }
 
         public void ActUpon(Cell actionObject)
         {
@@ -67,7 +75,7 @@
             var distance = Location.GetDistance(actionObject);
             if (entity == null && distance == 1)
                 this.MoveTo(actionObject);
-            else if (entity.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CrossbowmanInformation.Range)
+            else if (this.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CrossbowmanInformation.Range)
             {
                     AmmoLeft--;
                     actionObject.Entity.TakeDamage(CrossbowmanInformation.Damage);

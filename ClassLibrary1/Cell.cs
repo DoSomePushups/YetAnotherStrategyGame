@@ -19,12 +19,17 @@
             Entity = null;
         }
 
-        public void PutEntity(IEntity entity) {
+        public void PutEntity(IEntity entity)
+        {
             Entity = entity;
             CellChanged?.Invoke(this);
         }
 
-        public void RemoveEntity() => Entity = null;
+        public void RemoveEntity()
+        {
+            Entity = null;
+            CellChanged?.Invoke(this);
+        }
 
         public int GetDistance(Cell cell)
         {

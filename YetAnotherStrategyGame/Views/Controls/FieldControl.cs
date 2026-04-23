@@ -43,14 +43,34 @@ namespace YetAnotherStrategyGame.Views.Controls
                     cellButton.BackColor = Color.FromArgb(127, 179, 64);
                     cellButton.FlatStyle = FlatStyle.Flat;
                     DrawButtonSvg(cell, cellButton);
+                    cellButton.Paint += (s, e) =>
+                    {
+                        if (cell.Entity != null)
+                        {
+                            var maxHP = GetMaxHpForEntity(cell.Entity);
+                            var barWidth = 60;
+                            var barHeight = 5;
+                            var posX = (cellButton.Width - barWidth) / 2;
+                            var posY = cellButton.Height - barHeight - 5;
+                            DrawHealthBar(e.Graphics, cell.Entity.HP, maxHP, posX, posY, barWidth, barHeight);
+                        }
+                    };
                     cell.CellChanged += (updatedCell) =>
                     {
-                        // Cлучай, если изменения придут из другого потока
+                        //Если из другого потока
                         if (cellButton.InvokeRequired)
-                            cellButton.Invoke(new Action(() => DrawButtonSvg(updatedCell, cellButton)));
+                            cellButton.Invoke(new Action(() => {
+                                DrawButtonSvg(updatedCell, cellButton);
+                                //cellButton.Invalidate();
+                            }));
                         else
+                        {
                             DrawButtonSvg(updatedCell, cellButton);
+                            //cellButton.Invalidate();
+                        }
                     };
+                    //cell.Entity?.HpChanged += (updatedCell) =>
+                    //    cellButton.Invalidate();
                     cellButton.Click += (sender, args) =>
                         Game.Session.FirstPlayer.Click(cell);
                     Controls.Add(cellButton);
@@ -60,24 +80,62 @@ namespace YetAnotherStrategyGame.Views.Controls
 
         private void DrawButtonSvg(Cell cell, Button cellButton)
         {
-            var svgName = cell.Entity switch
+            EntityType type = cell.Entity switch
             {
-                Farm => "farm.svg",
-                Mine => "GoldMine.svg",
-                Castle => "castle.svg",
-                Barracks => "SwordBarracks.svg",
-                CrossbowWorkshop => "CrossbowBarracks.svg",
-                CannonFactory => "CannonFactory.svg",
-                Human => "Human.svg",
-                _ => null
+                Farm => EntityType.Farm,
+                Mine => EntityType.Mine,
+                Castle => EntityType.Castle,
+                Barracks => EntityType.Barracks,
+                CrossbowWorkshop => EntityType.CrossbowWorkshop,
+                CannonFactory => EntityType.CannonFactory,
+                Human => EntityType.Human,
+                Warrior => EntityType.Warrior,
+                Crossbowman => EntityType.Crossbowman,
+                Cannon => EntityType.Cannon,
+                _ => EntityType.None
             };
-            var svgPath = svgName != null ? Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", svgName) : null;
-            if (svgPath != null)
+            if (Game.SvgImages.TryGetValue(type, out var image))
             {
-                cellButton.Image = SvgDocument.Open(svgPath).Draw(80, 80);
+                cellButton.Image = image;
                 if (cell.Entity.Owner.Team == Team.Second)
                     cellButton.BackColor = Color.FromArgb(100, 255, 0, 0);
             }
+            else
+            {
+                cellButton.Image = null;
+                cellButton.BackColor = Color.FromArgb(127, 179, 64);
+            }
+        }
+
+        private int GetMaxHpForEntity(IEntity entity) => entity switch
+        {
+            Farm => FarmInformation.MaxHP,
+            Mine => MineInformation.MaxHP,
+            Castle => CastleInformation.MaxHP,
+            Barracks => BarracksInformation.MaxHP,
+            CrossbowWorkshop => CrossbowWorkshopInformation.MaxHP,
+            CannonFactory => CannonFactoryInformation.MaxHP,
+            Warrior => WarriorInformation.MaxHP,
+            Crossbowman => CrossbowmanInformation.MaxHP,
+            Cannon => CannonInformation.MaxHP,
+            Human => HumanInformation.MaxHP,
+            _ => 1
+        };
+
+        private void DrawHealthBar(Graphics g, int hp, int maxHp, int x, int y, int width, int height)
+        {
+            var percent = (double)hp / maxHp;
+            var fillWidth = (int)(width * percent);
+
+            using (SolidBrush redBrush = new SolidBrush(Color.Red))
+                g.FillRectangle(redBrush, x, y, width, height);
+
+            if (fillWidth > 0)
+                using (SolidBrush greenBrush = new SolidBrush(Color.LimeGreen))
+                    g.FillRectangle(greenBrush, x, y, fillWidth, height);
+
+            using (Pen borderPen = new Pen(Color.Black, 1))
+                g.DrawRectangle(borderPen, x, y, width, height);
         }
     }
 }

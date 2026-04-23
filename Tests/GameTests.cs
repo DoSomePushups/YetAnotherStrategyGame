@@ -80,8 +80,65 @@ namespace Tests
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
             player.Click(map[5, 12]);
-            Assert.That(map[6, 12].Entity is Human);
-            Assert.That(map[6, 12].Entity.Owner, Is.EqualTo(player));
+            Assert.That(map[4, 11].Entity is Human);
+            Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+        }
+
+        [Test]
+        public void CanMoveHumanAfterSpawn()
+        {
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
+            player.Click(map[5, 12]);
+            Assert.That(map[4, 11].Entity is Human);
+            Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+            Assert.That(player.SelectedUnit == null);
+            player.Click(map[4, 11]);
+            Assert.That(player.SelectedUnit is Human);
+            player.Click(map[4, 10]);
+            Assert.That(map[4, 11].Entity == null);
+            Assert.That(map[4, 10].Entity is Human);
+        }
+
+        [Test]
+        public void CanPunchCastle()
+        {
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
+            player.Click(map[5, 12]);
+            Assert.That(map[4, 11].Entity is Human);
+            Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+            Assert.That(player.SelectedUnit == null);
+            player.Click(map[4, 11]);
+            Assert.That(player.SelectedUnit is Human);
+            var castleCell = map[4, 10];
+            castleCell.PutEntity(new Castle(map[4, 10], Game.Session.SecondPlayer));
+            Assert.That(castleCell.Entity is Castle);
+            Assert.That(castleCell.Entity.Owner == Game.Session.SecondPlayer);
+            Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP);
+            player.Click(map[4, 10]);
+            Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP - HumanInformation.Damage);
+        }
+
+        [Test]
+        public void CanUpgradeHumanToWarrior()
+        {
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
+            var humanCell = map[4, 11];
+            var barracksCell = map[4,12];
+            player.Click(map[5, 12]);
+            Assert.That(humanCell.Entity is Human);
+            Assert.That(humanCell.Entity.Owner, Is.EqualTo(player));
+            Assert.That(player.SelectedUnit == null);
+            player.SelectStoreItem(BuildingType.Barracks);
+            player.Click(barracksCell);
+            Assert.That(barracksCell.Entity is Barracks);
+            Assert.That(barracksCell.Entity.Owner, Is.EqualTo(player));
+            player.Click(humanCell);
+            Assert.That(player.SelectedUnit is Human);
+            player.Click(barracksCell);
+            Assert.That(humanCell.Entity is Warrior);
         }
     }
 }

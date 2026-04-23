@@ -24,6 +24,8 @@
 
         public Player Owner { get; private set; }
 
+        public event Action<Cell> HpChanged;
+
         public Warrior(Cell location, Player owner)
         {
             HP = 150;
@@ -45,13 +47,19 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
+            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }
 
         public void Die() => Location.RemoveEntity();
 
-        private void MoveTo(Cell location) => Location = location;
+        private void MoveTo(Cell location)
+        {
+            Location.RemoveEntity();
+            Location = location;
+            Location.PutEntity(this);
+        }
 
         public void ActUpon(Cell actionObject)
         {
@@ -61,7 +69,7 @@
                 return;
             if (entity == null)
                 this.MoveTo(actionObject);
-            else if (entity.Owner.Team != actionObject.Entity.Owner.Team)
+            else if (this.Owner.Team != actionObject.Entity.Owner.Team)
                 actionObject.Entity.TakeDamage(WarriorInformation.Damage);
         }
     }

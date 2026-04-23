@@ -49,14 +49,20 @@
                 SelectedUnit.ActUpon(cell);
                 SelectedUnit = null;
             }
-            else if (entity == null && SelectedBuilding != null)
-                TryBuild(cell);
-            else if (entity is ISpawnBuilding spawnBuilding)
-                spawnBuilding.TrySpawn();
-            else
+            else if (entity == null || owner == this)
             {
-                //Начать производить в здании
-                throw new NotImplementedException();
+
+                if (entity is ISpawnBuilding spawnBuilding)
+                    spawnBuilding.TrySpawn();
+                else if (entity is IUnit unit)
+                    SelectedUnit = unit;
+                else if (entity == null && SelectedBuilding != null)
+                    TryBuild(cell);
+                else if (false)
+                {
+                    //Начать производить в здании
+                    throw new NotImplementedException();
+                }
             }
         }
 
@@ -68,14 +74,14 @@
                 SelectedBuilding = null;
         }
 
-        public void Select(Cell cell)
-        {
-            var entity = cell.Entity;
-            if (entity is IUnit && entity.Owner == this)
-                SelectedUnit = (IUnit)entity;
-            else
-                SelectedUnit = null;
-        }
+        //public void Select(Cell cell)
+        //{
+        //    var entity = cell.Entity;
+        //    if (entity is IUnit unit && entity.Owner == this)
+        //        SelectedUnit = (IUnit)entity;
+        //    else
+        //        SelectedUnit = null;
+        //}
 
         public void TryBuild(Cell cell)
         {
@@ -96,6 +102,7 @@
                 Food -= costFood;
                 StatsChanged?.Invoke(Food, Gold);
                 cell.PutEntity(createBuilding());
+                SelectedBuilding = null;
             }
         }
 

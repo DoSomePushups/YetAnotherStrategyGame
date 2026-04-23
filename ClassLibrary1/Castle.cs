@@ -25,6 +25,8 @@
 
         public Player Owner { get; private set; }
 
+        public event Action<Cell> HpChanged;
+
         public Castle(Cell location, Player owner)
         {
             HP = 2000;
@@ -46,6 +48,7 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
+            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }
@@ -54,8 +57,17 @@
 
         public void TrySpawn()
         {
-            var spawnPoints = new List<Cell>(8);
-            var field = Owner.GameSession.GameField;
+            Cell? spawnPoint = FindSpawnCell(Owner.GameSession.GameField);
+            var spawnCost = CastleInformation.SpawnCost;
+            if (spawnPoint != null && Owner.Food >= spawnCost)
+            {
+                Owner.BuySpawn(spawnCost);
+                spawnPoint.PutEntity(new Human(spawnPoint, Owner));
+            }
+        }
+
+        private Cell? FindSpawnCell(Field field)
+        {
             for (var i = -1; i <= 1; i++)
                 for (var j = -1; j <= 1; j++)
                 {
@@ -65,17 +77,10 @@
                     {
                         var cell = field.Map[x, y];
                         if (cell.IsEmpty)
-                            spawnPoints.Add(cell);
+                            return cell;
                     }
                 }
-            var spawnPoint = spawnPoints.FirstOrDefault();
-            var spawnCost = CastleInformation.SpawnCost;
-            if (spawnPoint != null && Owner.Food >= spawnCost)
-            {
-                Owner.BuySpawn(spawnCost);
-                spawnPoint.PutEntity(new Human(spawnPoint, Owner));
-            }
+            return null;
         }
-
     }
 }
