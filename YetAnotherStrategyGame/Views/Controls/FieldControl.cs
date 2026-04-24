@@ -52,25 +52,18 @@ namespace YetAnotherStrategyGame.Views.Controls
                             var barHeight = 5;
                             var posX = (cellButton.Width - barWidth) / 2;
                             var posY = cellButton.Height - barHeight - 5;
-                            DrawHealthBar(e.Graphics, cell.Entity.HP, maxHP, posX, posY, barWidth, barHeight);
+                            var graphics = e.Graphics;
+                            DrawHealthBar(graphics, cell.Entity.HP, maxHP, posX, posY, barWidth, barHeight);
                         }
                     };
                     cell.CellChanged += (updatedCell) =>
                     {
                         //Если из другого потока
                         if (cellButton.InvokeRequired)
-                            cellButton.Invoke(new Action(() => {
-                                DrawButtonSvg(updatedCell, cellButton);
-                                //cellButton.Invalidate();
-                            }));
+                            cellButton.Invoke(new Action(() => DrawButtonSvg(updatedCell, cellButton)));
                         else
-                        {
                             DrawButtonSvg(updatedCell, cellButton);
-                            //cellButton.Invalidate();
-                        }
                     };
-                    //cell.Entity?.HpChanged += (updatedCell) =>
-                    //    cellButton.Invalidate();
                     cellButton.Click += (sender, args) =>
                         Game.Session.FirstPlayer.Click(cell);
                     Controls.Add(cellButton);
@@ -137,5 +130,11 @@ namespace YetAnotherStrategyGame.Views.Controls
             using (Pen borderPen = new Pen(Color.Black, 1))
                 g.DrawRectangle(borderPen, x, y, width, height);
         }
+
+        //private void DrawUnitRange(Graphics g, int range, int x, int y)
+        //{
+        //    using (Pen borderPen = new Pen(Color.Blue, 2))
+        //        g.DrawRectangle(borderPen, x - CellSize * range, y - CellSize * range, range * 2 + CellSize, range * 2 + CellSize);
+        //}
     }
 }

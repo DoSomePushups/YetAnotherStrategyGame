@@ -55,7 +55,9 @@ namespace Model
 
             public System.Timers.Timer Timer { get; private set; }
 
-            public int Time { get; private set; }
+            public int TimeTicks { get; private set; }
+
+            public int TimeSeconds => TimeTicks / 10;
 
             public GameSession(int fieldWidth, int fieldHeight)
             {
@@ -67,12 +69,12 @@ namespace Model
                 var startCell2 = GameField.Map[fieldWidth / 2, 0];
                 startCell1.PutEntity(new Castle(startCell1, FirstPlayer));
                 startCell2.PutEntity(new Castle(startCell2, SecondPlayer));
-                Time = 0;
+                TimeTicks = 0;
                 Timer = new(100);
                 Timer.Elapsed += (s, e) => OnTick?.Invoke();
                 Timer.AutoReset = true;
                 Timer.Start();
-                OnTick += () => Time++;
+                OnTick += () => TimeTicks++;
             }
 
             public event Action OnTick;

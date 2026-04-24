@@ -25,8 +25,6 @@
 
         public Player Owner { get; private set; }
 
-        public event Action<Cell> HpChanged;
-
         public Castle(Cell location, Player owner)
         {
             HP = 2000;
@@ -48,7 +46,6 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
-            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }
@@ -62,7 +59,9 @@
             if (spawnPoint != null && Owner.Food >= spawnCost)
             {
                 Owner.BuySpawn(spawnCost);
-                spawnPoint.PutEntity(new Human(spawnPoint, Owner));
+                var human = new Human(spawnPoint, Owner);
+                spawnPoint.PutEntity(human);
+                Owner.OwnedEntities.Add(human);
             }
         }
 

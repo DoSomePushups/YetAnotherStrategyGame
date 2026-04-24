@@ -12,9 +12,7 @@
 
         public TeamColor Color { get; private set; }
 
-        public HashSet<IBuilding> OwnedBuildings { get; private set; }
-
-        public HashSet<IUnit> OwnedUnits { get; private set; }
+        public HashSet<IEntity> OwnedEntities { get; private set; }
 
         public int Gold { get; private set; }
 
@@ -33,8 +31,7 @@
             Id = id;
             Team = (Team)id;
             Color = (TeamColor)id;
-            OwnedBuildings = new HashSet<IBuilding>();
-            OwnedUnits = new HashSet<IUnit>();
+            OwnedEntities = new();
             Gold = 100;
             Food = 50;
             SelectedBuilding = null;
@@ -74,15 +71,6 @@
                 SelectedBuilding = null;
         }
 
-        //public void Select(Cell cell)
-        //{
-        //    var entity = cell.Entity;
-        //    if (entity is IUnit unit && entity.Owner == this)
-        //        SelectedUnit = (IUnit)entity;
-        //    else
-        //        SelectedUnit = null;
-        //}
-
         public void TryBuild(Cell cell)
         {
             var buildingData = SelectedBuilding switch
@@ -101,8 +89,10 @@
                 Gold -= costGold;
                 Food -= costFood;
                 StatsChanged?.Invoke(Food, Gold);
-                cell.PutEntity(createBuilding());
+                var building = createBuilding();
+                cell.PutEntity(building);
                 SelectedBuilding = null;
+                OwnedEntities.Add(building);
             }
         }
 

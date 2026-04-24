@@ -37,8 +37,6 @@
 
         public Player Owner { get; private set; }
 
-        public event Action<Cell> HpChanged;
-
         public CannonFactory(Cell location, Player owner)
         {
             HP = 1800;
@@ -62,7 +60,6 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
-            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }

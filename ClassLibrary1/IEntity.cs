@@ -8,8 +8,6 @@
 
     public interface IEntity
     {
-        event Action<Cell> HpChanged;
-
         int HP { get; }
 
         int UnactionTime { get; }

@@ -25,8 +25,6 @@
 
         public Player Owner { get; private set; }
 
-        public event Action<Cell> HpChanged;
-
         public Mine(Cell location, Player owner)
         {
             HP = 800;
@@ -48,7 +46,6 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
-            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }

@@ -13,6 +13,10 @@
 
     public interface IUnit : IEntity
     {
+        public bool HasMoved { get; }
+
+        public bool HasAttacked { get; }
+
         public void ActUpon(Cell actionObject);
     }
 }

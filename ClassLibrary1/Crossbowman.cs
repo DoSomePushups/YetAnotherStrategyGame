@@ -31,7 +31,9 @@
 
         public Player Owner { get; private set; }
 
-        public event Action<Cell> HpChanged;
+        public bool HasMoved { get; private set; }
+
+        public bool HasAttacked { get; private set; } // Остановился здесь. Нужно делать кулдаун после хождения и атаки.
 
         public Crossbowman(Cell location, Player owner)
         {
@@ -55,7 +57,6 @@
         public void TakeDamage(int damage)
         {
             HP -= damage;
-            HpChanged?.Invoke(Location);
             if (HP <= 0)
                 Die();
         }

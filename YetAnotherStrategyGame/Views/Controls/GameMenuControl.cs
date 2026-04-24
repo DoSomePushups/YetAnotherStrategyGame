@@ -37,7 +37,7 @@ namespace YetAnotherStrategyGame.Views.Controls
                 stats.Gold.Quantity.Text = Player.Gold.ToString();
             };
             Game.Session.OnTick += () =>
-                stats.Time.Quantity.Text = (Game.Session.Time / 10).ToString();
+                stats.Time.Quantity.Text = (Game.Session.TimeSeconds).ToString();
             stats.Location = new Point(0, 0);
             var store = new Store(Player);
             store.Location = new Point(62, 273);
