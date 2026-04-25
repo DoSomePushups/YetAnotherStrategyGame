@@ -45,6 +45,8 @@ namespace Model
 
         public class GameSession
         {
+            public HashSet<Player> Players { get; private set; }
+
             public Player FirstPlayer { get; private set; }
 
             public Player SecondPlayer { get; private set; }
@@ -57,24 +59,32 @@ namespace Model
 
             public int TimeTicks { get; private set; }
 
-            public int TimeSeconds => TimeTicks / 10;
+            public int TimeSeconds => TimeTicks / 5;
 
             public GameSession(int fieldWidth, int fieldHeight)
             {
                 LastPlayerId = 0;
                 FirstPlayer = new Player(this, "User", ++LastPlayerId);
                 SecondPlayer = new Player(this, "AI", ++LastPlayerId);
+                Players = new HashSet<Player>() { FirstPlayer, SecondPlayer };
                 GameField = new Field(fieldWidth, fieldHeight);
                 var startCell1 = GameField.Map[fieldWidth / 2, fieldHeight - 1];
                 var startCell2 = GameField.Map[fieldWidth / 2, 0];
-                startCell1.PutEntity(new Castle(startCell1, FirstPlayer));
-                startCell2.PutEntity(new Castle(startCell2, SecondPlayer));
+                var castle1 = new Castle(startCell1, FirstPlayer);
+                var castle2 = new Castle(startCell2, SecondPlayer);
+                startCell1.PutEntity(castle1);
+                startCell2.PutEntity(castle2);
                 TimeTicks = 0;
-                Timer = new(100);
+                Timer = new(200);
                 Timer.Elapsed += (s, e) => OnTick?.Invoke();
                 Timer.AutoReset = true;
                 Timer.Start();
-                OnTick += () => TimeTicks++;
+                OnTick += () =>
+                {
+                    TimeTicks++;
+                    castle1.HandleTick();
+                    castle2.HandleTick();
+                };
             }
 
             public event Action OnTick;

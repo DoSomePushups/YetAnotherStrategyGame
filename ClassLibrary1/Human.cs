@@ -4,13 +4,11 @@
     {
         public static int MaxHP { get; } = 50;
 
-        public static int Damage { get; } = 10;
+        public static int Damage { get; } = 15;
 
         public static UnitType Type { get; } = UnitType.Melee;
 
-        public static int AttackCD { get; } = 2;
-
-        public static int MoveCD { get; } = 3;
+        public static int RestTime { get; } = 1;
     }
 
     public class Human : IUnit
@@ -19,20 +17,29 @@
 
         public int UnactionTime { get; private set; }
 
+        public bool IsAvailable { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
-        public bool HasMoved { get; private set; }
-
-        public bool HasAttacked { get; private set; }
-
         public Human(Cell location, Player owner)
         {
-            HP = 50;
+            HP = HumanInformation.MaxHP / 10;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= HumanInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= HumanInformation.RestTime * 10)
+                    Heal(Math.Max(HumanInformation.MaxHP / 200, 1));
+            }
+            UnactionTime++;
         }
 
         public void Heal(int heal)
@@ -52,13 +59,19 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
 
         private void MoveTo(Cell location)
         {
             Location.RemoveEntity();
             Location = location;
             Location.PutEntity(this);
+            IsAvailable = false;
+            UnactionTime = 0;
         }
 
         public void ActUpon(Cell actionObject)
@@ -69,17 +82,27 @@
                 return;
             if (entity == null)
                 this.MoveTo(actionObject);
-            else if (this.Owner.Team != actionObject.Entity.Owner.Team)
-                actionObject.Entity.TakeDamage(HumanInformation.Damage);
-            else if (entity.Owner.Team == actionObject.Entity.Owner.Team)
+            else if (this.Owner.Team != entity.Owner.Team)
             {
-                if (entity is Barracks)
-                    Location.PutEntity(new Warrior(Location, Owner));
-                else if (entity is CrossbowWorkshop)
-                    Location.PutEntity(new Crossbowman(Location, Owner));
-                else if (entity is CannonFactory)
-                    Location.PutEntity(new Cannon(Location, Owner));
+                entity.TakeDamage(HumanInformation.Damage);
+                GetTired();
             }
+            else if (this.Owner.Team == entity.Owner.Team)
+            {
+                if (entity is IProductionBuilding productionBuilding && productionBuilding.TryTrain(Location))
+                    Owner.GameSession.OnTick -= () => this.HandleTick();
+                else if (entity is IResourceBuilding resourceBuilding)
+                {
+                    resourceBuilding.Collect();
+                    GetTired();
+                }
+            }
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
         }
     }
 }

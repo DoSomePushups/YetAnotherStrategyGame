@@ -37,10 +37,14 @@
             SelectedBuilding = null;
         }
 
-        public void Click(Cell cell)
+        public void LeftClick(Cell cell)
         {
             var entity = cell.Entity;
             var owner = entity?.Owner;
+
+            if (entity != null && !entity.IsAvailable)
+                return;
+
             if (SelectedUnit != null)
             {
                 SelectedUnit.ActUpon(cell);
@@ -55,12 +59,17 @@
                     SelectedUnit = unit;
                 else if (entity == null && SelectedBuilding != null)
                     TryBuild(cell);
-                else if (false)
-                {
-                    //Начать производить в здании
-                    throw new NotImplementedException();
-                }
+                else if (entity is IProductionBuilding productionBuilding)
+                    productionBuilding.Produce();
             }
+        }
+
+        public void RightClick(Cell cell)
+        {
+            var entity = cell.Entity;
+            var owner = entity?.Owner;
+            if (owner == this && entity is IAmmunitionBuilding ammunitionBuilding)
+                ammunitionBuilding.ProduceAmmo();
         }
 
         public void SelectStoreItem(BuildingType? buildingType)
@@ -91,14 +100,28 @@
                 StatsChanged?.Invoke(Food, Gold);
                 var building = createBuilding();
                 cell.PutEntity(building);
+                GameSession.OnTick += () => building.HandleTick();
                 SelectedBuilding = null;
                 OwnedEntities.Add(building);
             }
         }
 
-        public void BuySpawn(int spawnCost)
+        public bool TryBuy(int foodCost, int goldCost)
         {
-            Food -= spawnCost;
+            if (Food >= foodCost && Gold >= goldCost)
+            {
+                Food -= foodCost;
+                Gold -= goldCost;
+                StatsChanged?.Invoke(Food, Gold);
+                return true;
+            }
+            return false;
+        }
+
+        public void GetResources(int food, int gold)
+        {
+            Food += food;
+            Gold += gold;
             StatsChanged?.Invoke(Food, Gold);
         }
     }

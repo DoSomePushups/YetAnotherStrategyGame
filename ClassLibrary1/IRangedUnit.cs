@@ -12,5 +12,7 @@
     public interface IRangedUnit : IUnit
     {
         int AmmoLeft { get; }
+
+        public void TakeAmmo(int amount);
     }
 }

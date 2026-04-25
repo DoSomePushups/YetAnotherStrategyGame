@@ -8,9 +8,7 @@
 
         public static int CostFood { get; } = 10;
 
-        public static int BuildTime { get; } = 50;
-
-        public static int SpawnTime { get; } = 9;
+        public static int RestTime { get; } = 6;
 
         public static int SpawnCost { get; } = 10;
     }
@@ -21,16 +19,29 @@
 
         public int UnactionTime { get; private set; }
 
+        public bool IsAvailable { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
         public Castle(Cell location, Player owner)
         {
-            HP = 2000;
+            HP = CastleInformation.MaxHP / 10;
             UnactionTime = 0;
             Location = location;
             Owner = owner;
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= CastleInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= CastleInformation.RestTime * 10)
+                    Heal(Math.Max(CastleInformation.MaxHP / 200, 1));
+            }
+            UnactionTime++;
         }
 
         public void Heal(int heal)
@@ -50,18 +61,23 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
 
         public void TrySpawn()
         {
             Cell? spawnPoint = FindSpawnCell(Owner.GameSession.GameField);
             var spawnCost = CastleInformation.SpawnCost;
-            if (spawnPoint != null && Owner.Food >= spawnCost)
+            if (spawnPoint != null && Owner.TryBuy(spawnCost, 0))
             {
-                Owner.BuySpawn(spawnCost);
                 var human = new Human(spawnPoint, Owner);
                 spawnPoint.PutEntity(human);
+                Owner.GameSession.OnTick += () => human.HandleTick();
                 Owner.OwnedEntities.Add(human);
+                GetTired();
             }
         }
 
@@ -80,6 +96,12 @@
                     }
                 }
             return null;
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
         }
     }
 }

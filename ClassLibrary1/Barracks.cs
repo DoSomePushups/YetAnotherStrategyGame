@@ -4,15 +4,13 @@
     {
         public static int MaxHP { get; } = 1200;
 
-        public static int CostGold { get; } = 20;
+        public static int CostGold { get; } = 25;
 
         public static int CostFood { get; } = 0;
 
-        public static int BuildTime { get; } = 20;
-
         public static Equipment EquipmentType { get; } = Equipment.Sword;
 
-        public static int ProductionTime { get; } = 10;
+        public static int RestTime { get; } = 6;
 
         public static int ProductionCost { get; } = 2;
 
@@ -25,16 +23,55 @@
 
         public int UnactionTime { get; private set; }
 
+        public int ItemAmount { get; private set; }
+
+        public bool IsAvailable { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
         public Barracks(Cell location, Player owner)
         {
-            HP = 1200;
+            HP = BarracksInformation.MaxHP / 10;
             UnactionTime = 0;
+            ItemAmount = 1;
             Location = location;
             Owner = owner;
+        }
+
+        public void Produce()
+        {
+            if (ItemAmount < BarracksInformation.Capacity && Owner.TryBuy(0, BarracksInformation.ProductionCost))
+            {
+                ItemAmount++;
+                GetTired();
+            }
+        }
+
+        public bool TryTrain(Cell location)
+        {
+            if (ItemAmount > 0)
+            {
+                var warrior = new Warrior(location, Owner);
+                location.PutEntity(warrior);
+                Owner.GameSession.OnTick += () => warrior.HandleTick();
+                ItemAmount--;
+                GetTired();
+                return true;
+            }
+            return false;
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= BarracksInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= BarracksInformation.RestTime * 10)
+                    Heal(Math.Max(BarracksInformation.MaxHP / 200, 1));
+            }
+            UnactionTime++;
         }
 
         public void Heal(int heal)
@@ -54,6 +91,16 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
+        }
     }
 }

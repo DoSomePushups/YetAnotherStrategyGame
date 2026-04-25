@@ -14,9 +14,7 @@
 
         public static int Capacity { get; } = 2;
 
-        public static int AttackCD { get; } = 15;
-
-        public static int MoveCD { get; } = 8;
+        public static int RestTime { get; } = 5;
     }
 
     public class Cannon : IRangedUnit
@@ -26,7 +24,9 @@
         public int AmmoLeft { get; private set; }
 
         public int UnactionTime { get; private set; }
-        
+
+        public bool IsAvailable { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -37,12 +37,23 @@
 
         public Cannon(Cell location, Player owner)
         {
-            HP = 50;
+            HP = CannonInformation.MaxHP / 10;
             AmmoLeft = 1;
             UnactionTime = 0;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= CannonInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= CannonInformation.RestTime * 10)
+                    Heal(Math.Max(CannonInformation.MaxHP / 200, 1));
+            }
+            UnactionTime++;
         }
 
         public void Heal(int heal)
@@ -62,13 +73,20 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
+
+        public void TakeAmmo(int amount) => AmmoLeft += amount;
 
         private void MoveTo(Cell location)
         {
             Location.RemoveEntity();
             Location = location;
             Location.PutEntity(this);
+            GetTired();
         }
 
         public void ActUpon(Cell actionObject)
@@ -77,11 +95,18 @@
             var distance = Location.GetDistance(actionObject);
             if (entity == null && distance == 1)
                 this.MoveTo(actionObject);
-            else if (entity != null && this.Owner.Team != actionObject.Entity.Owner.Team && AmmoLeft > 0 && distance <= CannonInformation.Range)
+            else if (entity != null && this.Owner.Team != entity.Owner.Team && AmmoLeft > 0 && distance <= CannonInformation.Range)
             {
-                    AmmoLeft--;
-                    actionObject.Entity.TakeDamage(CannonInformation.Damage);
+                AmmoLeft--;
+                entity.TakeDamage(CannonInformation.Damage);
+                GetTired();
             }
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
         }
     }
 }

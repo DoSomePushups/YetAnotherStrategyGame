@@ -2,8 +2,6 @@
 {
     public interface ISpawnBuildingInformation : IBuildingInformation
     {
-        static abstract int SpawnTime { get; }
-
         static abstract int SpawnCost { get; }
     }
 

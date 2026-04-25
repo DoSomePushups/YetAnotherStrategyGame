@@ -8,17 +8,13 @@
 
         public static int CostFood { get; } = 0;
 
-        public static int BuildTime { get; } = 50;
-
         public static Equipment EquipmentType { get; } = Equipment.Cannon;
 
-        public static int ProductionTime { get; } = 30;
+        public static int RestTime { get; } = 8;
 
         public static int ProductionCost { get; } = 15;
 
-        public static int Capacity { get; } = 3;
-
-        public static int AmmoProductionTime { get; } = 10;
+        public static int Capacity { get; } = 2;
 
         public static int AmmoCost { get; } = 5;
 
@@ -33,19 +29,74 @@
 
         public int UnactionTime { get; private set; }
 
-        public Cell Location {  get; private set; }
+        public int ItemAmount { get; private set; }
+
+        public int AmmoAmount { get; private set; }
+
+        public bool IsAvailable { get; private set; }
+
+        public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
         public CannonFactory(Cell location, Player owner)
         {
-            HP = 1800;
+            HP = CannonFactoryInformation.MaxHP / 10;
             UnactionTime = 0;
+            ItemAmount = 1;
+            AmmoAmount = 2;
             Location = location;
             Owner = owner;
         }
 
-        public void PlaceOn(Cell cell) => Location = cell;
+        public void Produce()
+        {
+            if (ItemAmount < CannonFactoryInformation.Capacity && Owner.TryBuy(0, CannonFactoryInformation.ProductionCost))
+            {
+                ItemAmount++;
+                GetTired();
+            }
+        }
+
+        public void ProduceAmmo()
+        {
+            var capacity = CannonFactoryInformation.AmmoCapacity;
+            var cost = CannonFactoryInformation.AmmoCost;
+            var difference = capacity - AmmoAmount;
+            if (AmmoAmount < capacity && Owner.TryBuy(0, cost * difference))
+            {
+                AmmoAmount = capacity;
+                GetTired();
+            }
+        }
+
+        public bool TryTrain(Cell location)
+        {
+            if (ItemAmount > 0)
+            {
+                var cannon = new Cannon(location, Owner);
+                var ammoTakeAmount = Math.Min(AmmoAmount, CannonFactoryInformation.Capacity);
+                cannon.TakeAmmo(ammoTakeAmount);
+                location.PutEntity(cannon);
+                ItemAmount--;
+                AmmoAmount -= ammoTakeAmount;
+                Owner.GameSession.OnTick += () => cannon.HandleTick();
+                GetTired();
+                return true;
+            }
+            return false;
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= CannonFactoryInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= CannonFactoryInformation.RestTime * 10)
+                    Heal(Math.Max(CannonFactoryInformation.MaxHP / 200, 1));
+            }
+            UnactionTime++;
+        }
 
         public void Heal(int heal)
         {
@@ -64,6 +115,16 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
+        }
     }
 }

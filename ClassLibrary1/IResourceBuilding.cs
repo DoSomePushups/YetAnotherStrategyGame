@@ -2,13 +2,13 @@
 {
     public interface IResourceBuildingInformation : IBuildingInformation
     {
-        static abstract int PassiveProductionTime { get; }
-
         static abstract PassiveResourceType PassiveResourceType { get; }
+
+        static abstract int ResourceProductionQuantity { get; }
     }
 
     public interface IResourceBuilding : IBuilding
     {
-        
+        public void Collect();
     }
 }

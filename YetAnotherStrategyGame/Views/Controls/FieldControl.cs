@@ -47,14 +47,14 @@ namespace YetAnotherStrategyGame.Views.Controls
                     {
                         if (cell.Entity != null)
                         {
-                            var maxHP = GetMaxHpForEntity(cell.Entity);
-                            var barWidth = 60;
-                            var barHeight = 5;
-                            var posX = (cellButton.Width - barWidth) / 2;
-                            var posY = cellButton.Height - barHeight - 5;
-                            var graphics = e.Graphics;
-                            DrawHealthBar(graphics, cell.Entity.HP, maxHP, posX, posY, barWidth, barHeight);
+                            var (maxHP, restTime) = GetEntityInfo(cell.Entity);
+                            DrawEntityUI(e.Graphics, cell.Entity.HP, maxHP, cell.Entity.UnactionTime, restTime);
                         }
+                    };
+                    Game.Session.OnTick += () =>
+                    {
+                        if (cell.Entity != null)
+                            cellButton.Invalidate();
                     };
                     cell.CellChanged += (updatedCell) =>
                     {
@@ -64,8 +64,13 @@ namespace YetAnotherStrategyGame.Views.Controls
                         else
                             DrawButtonSvg(updatedCell, cellButton);
                     };
-                    cellButton.Click += (sender, args) =>
-                        Game.Session.FirstPlayer.Click(cell);
+                    cellButton.MouseClick += (sender, args) =>
+                    {
+                        if (args.Button == MouseButtons.Left)
+                            Game.Session.FirstPlayer.LeftClick(cell);
+                        else
+                            Game.Session.FirstPlayer.RightClick(cell);
+                    };  
                     Controls.Add(cellButton);
                 }
             }
@@ -100,35 +105,57 @@ namespace YetAnotherStrategyGame.Views.Controls
             }
         }
 
-        private int GetMaxHpForEntity(IEntity entity) => entity switch
+        private (int, int) GetEntityInfo(IEntity entity) => entity switch
         {
-            Farm => FarmInformation.MaxHP,
-            Mine => MineInformation.MaxHP,
-            Castle => CastleInformation.MaxHP,
-            Barracks => BarracksInformation.MaxHP,
-            CrossbowWorkshop => CrossbowWorkshopInformation.MaxHP,
-            CannonFactory => CannonFactoryInformation.MaxHP,
-            Warrior => WarriorInformation.MaxHP,
-            Crossbowman => CrossbowmanInformation.MaxHP,
-            Cannon => CannonInformation.MaxHP,
-            Human => HumanInformation.MaxHP,
-            _ => 1
+            Farm => (FarmInformation.MaxHP, FarmInformation.RestTime),
+            Mine => (MineInformation.MaxHP, MineInformation.RestTime),
+            Castle => (CastleInformation.MaxHP, CastleInformation.RestTime),
+            Barracks => (BarracksInformation.MaxHP, BarracksInformation.RestTime),
+            CrossbowWorkshop => (CrossbowWorkshopInformation.MaxHP, CrossbowWorkshopInformation.RestTime),
+            CannonFactory => (CannonFactoryInformation.MaxHP, CannonFactoryInformation.RestTime),
+            Warrior => (WarriorInformation.MaxHP, WarriorInformation.RestTime),
+            Crossbowman => (CrossbowmanInformation.MaxHP, CrossbowmanInformation.RestTime),
+            Cannon => (CannonInformation.MaxHP, CannonInformation.RestTime),
+            Human => (HumanInformation.MaxHP, HumanInformation.RestTime),
+            _ => throw new ArgumentException("Unknown entity")
         };
 
-        private void DrawHealthBar(Graphics g, int hp, int maxHp, int x, int y, int width, int height)
+        private void DrawEntityUI(Graphics g, int hp, int maxHp, int unactionTime, int restTime)
         {
+            var barWidth = 60;
+            var barHeight = 5;
+            var x = (CellSize - barWidth) / 2;
+            var y = CellSize - barHeight - 5;
             var percent = (double)hp / maxHp;
-            var fillWidth = (int)(width * percent);
-
+            var fillWidth = (int)(barWidth * percent);
             using (SolidBrush redBrush = new SolidBrush(Color.Red))
-                g.FillRectangle(redBrush, x, y, width, height);
+                g.FillRectangle(redBrush, x, y, barWidth, barHeight);
 
             if (fillWidth > 0)
                 using (SolidBrush greenBrush = new SolidBrush(Color.LimeGreen))
-                    g.FillRectangle(greenBrush, x, y, fillWidth, height);
+                    g.FillRectangle(greenBrush, x, y, fillWidth, barHeight);
 
             using (Pen borderPen = new Pen(Color.Black, 1))
-                g.DrawRectangle(borderPen, x, y, width, height);
+                g.DrawRectangle(borderPen, x, y, barWidth, barHeight);
+
+            if (unactionTime < restTime * 5)
+                DrawBattery(g, unactionTime, restTime);
+        }
+
+        private void DrawBattery(Graphics g, int unactionTime, int restTime)
+        {
+            var width = 20;
+            var height = 20;
+            var x = 57;
+            var y = 3;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            var rect = new Rectangle(x, y, width, height);
+            var startAngle = 0;
+            var sweepAngle = (unactionTime / ((float)restTime * 5)) * 360f; ;
+
+            using (var brush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
+                g.FillPie(brush, rect, startAngle, sweepAngle);
         }
 
         //private void DrawUnitRange(Graphics g, int range, int x, int y)

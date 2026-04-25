@@ -8,21 +8,17 @@
 
         public static int CostFood { get; } = 0;
 
-        public static int BuildTime { get; } = 20;
-
         public static Equipment EquipmentType { get; } = Equipment.Crossbow;
 
-        public static int ProductionTime { get; } = 10;
+        public static int RestTime { get; } = 6;
 
-        public static int ProductionCost { get; } = 2;
+        public static int ProductionCost { get; } = 5;
 
-        public static int Capacity { get; } = 5;
+        public static int Capacity { get; } = 2;
 
-        public static int AmmoProductionTime { get; } = 3;
+        public static int AmmoCost { get; } = 1;
 
-        public static int AmmoCost { get; } = 2;
-
-        public static int AmmoCapacity { get; } = 10;
+        public static int AmmoCapacity { get; } = 12;
 
         public static AmmunitionType AmmoType { get; } = AmmunitionType.Arrows;
     }
@@ -33,19 +29,77 @@
 
         public int UnactionTime { get; private set; }
 
+        public int ItemAmount { get; private set; }
+
+        public int AmmoAmount { get; private set; }
+
+        public bool IsAvailable { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
 
         public CrossbowWorkshop(Cell location, Player owner)
         {
-            HP = 1200;
+            HP = CrossbowWorkshopInformation.MaxHP / 10;
+            ItemAmount = 1;
+            AmmoAmount = 3;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
         }
 
         public void PlaceOn(Cell cell) => Location = cell;
+
+        public void Produce()
+        {
+            if (ItemAmount < CrossbowWorkshopInformation.Capacity && Owner.TryBuy(0, CrossbowWorkshopInformation.ProductionCost))
+            {
+                ItemAmount++;
+                IsAvailable = false;
+                UnactionTime = 0;
+            }
+        }
+
+        public void ProduceAmmo()
+        {
+            var capacity = CrossbowWorkshopInformation.AmmoCapacity;
+            var cost = CrossbowWorkshopInformation.AmmoCost;
+            var difference = capacity - AmmoAmount;
+            if (AmmoAmount < capacity &&  Owner.TryBuy(0, cost * difference))
+            {
+                AmmoAmount = capacity;
+                GetTired();
+            }
+        }
+
+        public bool TryTrain(Cell location)
+        {
+            if (ItemAmount > 0)
+            {
+                var crossbowman = new Crossbowman(location, Owner);
+                var ammoTakeAmount = Math.Min(AmmoAmount, CrossbowmanInformation.Capacity);
+                crossbowman.TakeAmmo(ammoTakeAmount);
+                AmmoAmount -= ammoTakeAmount;
+                location.PutEntity(crossbowman);
+                Owner.GameSession.OnTick += () => crossbowman.HandleTick();
+                ItemAmount--;
+                GetTired();
+                return true;
+            }
+            return false;
+        }
+
+        public void HandleTick()
+        {
+            if (UnactionTime >= CrossbowWorkshopInformation.RestTime * 5)
+            {
+                IsAvailable = true;
+                if (UnactionTime >= CrossbowWorkshopInformation.RestTime * 10)
+                    Heal((int)Math.Round(CrossbowWorkshopInformation.MaxHP / 200.0));
+            }
+            UnactionTime++;
+        }
 
         public void Heal(int heal)
         {
@@ -64,6 +118,16 @@
                 Die();
         }
 
-        public void Die() => Location.RemoveEntity();
+        public void Die()
+        {
+            Location.RemoveEntity();
+            Owner.GameSession.OnTick -= () => this.HandleTick();
+        }
+
+        public void GetTired()
+        {
+            UnactionTime = 0;
+            IsAvailable = false;
+        }
     }
 }

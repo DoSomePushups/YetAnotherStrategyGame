@@ -69,7 +69,7 @@ namespace Tests
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
             player.SelectStoreItem(BuildingType.Mine);
-            player.Click(map[4, 12]);
+            player.LeftClick(map[4, 12]);
             Assert.That(map[4, 12].Entity is Mine);
             Assert.That(map[4, 12].Entity.Owner, Is.EqualTo(player));
         }
@@ -79,7 +79,7 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.Click(map[5, 12]);
+            player.LeftClick(map[5, 12]);
             Assert.That(map[4, 11].Entity is Human);
             Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
         }
@@ -89,13 +89,13 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.Click(map[5, 12]);
+            player.LeftClick(map[5, 12]);
             Assert.That(map[4, 11].Entity is Human);
             Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
-            player.Click(map[4, 11]);
+            player.LeftClick(map[4, 11]);
             Assert.That(player.SelectedUnit is Human);
-            player.Click(map[4, 10]);
+            player.LeftClick(map[4, 10]);
             Assert.That(map[4, 11].Entity == null);
             Assert.That(map[4, 10].Entity is Human);
         }
@@ -105,18 +105,18 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.Click(map[5, 12]);
+            player.LeftClick(map[5, 12]);
             Assert.That(map[4, 11].Entity is Human);
             Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
-            player.Click(map[4, 11]);
+            player.LeftClick(map[4, 11]);
             Assert.That(player.SelectedUnit is Human);
             var castleCell = map[4, 10];
             castleCell.PutEntity(new Castle(map[4, 10], Game.Session.SecondPlayer));
             Assert.That(castleCell.Entity is Castle);
             Assert.That(castleCell.Entity.Owner == Game.Session.SecondPlayer);
             Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP);
-            player.Click(map[4, 10]);
+            player.LeftClick(map[4, 10]);
             Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP - HumanInformation.Damage);
         }
 
@@ -127,17 +127,17 @@ namespace Tests
             var map = Game.Session.GameField.Map;
             var humanCell = map[4, 11];
             var barracksCell = map[4,12];
-            player.Click(map[5, 12]);
+            player.LeftClick(map[5, 12]);
             Assert.That(humanCell.Entity is Human);
             Assert.That(humanCell.Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
             player.SelectStoreItem(BuildingType.Barracks);
-            player.Click(barracksCell);
+            player.LeftClick(barracksCell);
             Assert.That(barracksCell.Entity is Barracks);
             Assert.That(barracksCell.Entity.Owner, Is.EqualTo(player));
-            player.Click(humanCell);
+            player.LeftClick(humanCell);
             Assert.That(player.SelectedUnit is Human);
-            player.Click(barracksCell);
+            player.LeftClick(barracksCell);
             Assert.That(humanCell.Entity is Warrior);
         }
     }
