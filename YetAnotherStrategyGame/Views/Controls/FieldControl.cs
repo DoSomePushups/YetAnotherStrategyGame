@@ -115,6 +115,7 @@ namespace YetAnotherStrategyGame.Views.Controls
 
         private void DrawUnitRange(Graphics graphics, IUnit selectedUnit)
         {
+            const int borderWidth = 4;
             var attackRange = selectedUnit switch
             {
                 Crossbowman => CrossbowmanInformation.Range,
@@ -122,10 +123,10 @@ namespace YetAnotherStrategyGame.Views.Controls
                 _ => 1
             };
             var unitLocation = selectedUnit.Location;
-            var rectangleX = (unitLocation.X - attackRange) * CellSize;
-            var rectangleY = (unitLocation.Y - attackRange) * CellSize;
-            var rectangleSize = (attackRange * 2 + 1) * CellSize;
-            using (var radiusPen = new Pen(Color.Blue, 4))
+            var rectangleX = (unitLocation.X - attackRange) * CellSize - borderWidth / 2;
+            var rectangleY = (unitLocation.Y - attackRange) * CellSize - borderWidth / 2;
+            var rectangleSize = (attackRange * 2 + 1) * CellSize + borderWidth;
+            using (var radiusPen = new Pen(Color.Blue, borderWidth))
                 graphics.DrawRectangle(radiusPen, rectangleX, rectangleY, rectangleSize, rectangleSize);
         }
 

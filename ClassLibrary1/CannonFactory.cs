@@ -16,7 +16,7 @@
 
         public static int Capacity { get; } = 2;
 
-        public static int AmmoCost { get; } = 5;
+        public static int AmmoCost { get; } = 4;
 
         public static int AmmoCapacity { get; } = 6;
 
