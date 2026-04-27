@@ -18,7 +18,7 @@
 
         public static int AmmoCost { get; } = 1;
 
-        public static int AmmoCapacity { get; } = 12;
+        public static int AmmoCapacity { get; } = 18;
 
         public static AmmunitionType AmmoType { get; } = AmmunitionType.Arrows;
     }
@@ -43,7 +43,7 @@
         {
             HP = CrossbowWorkshopInformation.MaxHP / 10;
             ItemAmount = 1;
-            AmmoAmount = 3;
+            AmmoAmount = 6;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -78,9 +78,7 @@
             if (ItemAmount > 0)
             {
                 var crossbowman = new Crossbowman(location, Owner);
-                var ammoTakeAmount = Math.Min(AmmoAmount, CrossbowmanInformation.Capacity);
-                crossbowman.TakeAmmo(ammoTakeAmount);
-                AmmoAmount -= ammoTakeAmount;
+                GiveAmmo(crossbowman);
                 location.PutEntity(crossbowman);
                 Owner.GameSession.OnTick += () => crossbowman.HandleTick();
                 ItemAmount--;
@@ -88,6 +86,13 @@
                 return true;
             }
             return false;
+        }
+
+        public void GiveAmmo(Crossbowman unit)
+        {
+            var ammoTakeAmount = Math.Min(AmmoAmount, CrossbowmanInformation.Capacity - unit.AmmoLeft);
+            unit.TakeAmmo(ammoTakeAmount);
+            AmmoAmount -= ammoTakeAmount;
         }
 
         public void HandleTick()

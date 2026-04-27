@@ -75,16 +75,21 @@
             if (ItemAmount > 0)
             {
                 var cannon = new Cannon(location, Owner);
-                var ammoTakeAmount = Math.Min(AmmoAmount, CannonFactoryInformation.Capacity);
-                cannon.TakeAmmo(ammoTakeAmount);
+                GiveAmmo(cannon);
                 location.PutEntity(cannon);
                 ItemAmount--;
-                AmmoAmount -= ammoTakeAmount;
                 Owner.GameSession.OnTick += () => cannon.HandleTick();
                 GetTired();
                 return true;
             }
             return false;
+        }
+
+        public void GiveAmmo(Cannon unit)
+        {
+            var ammoTakeAmount = Math.Min(AmmoAmount, CannonFactoryInformation.Capacity - unit.AmmoLeft);
+            unit.TakeAmmo(ammoTakeAmount);
+            AmmoAmount -= ammoTakeAmount;
         }
 
         public void HandleTick()

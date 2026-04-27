@@ -38,7 +38,7 @@
         public Cannon(Cell location, Player owner)
         {
             HP = CannonInformation.MaxHP / 10;
-            AmmoLeft = 1;
+            AmmoLeft = 0;
             UnactionTime = 0;
             Location = location;
             Owner = owner;
@@ -101,6 +101,8 @@
                 entity.TakeDamage(CannonInformation.Damage);
                 GetTired();
             }
+            else if (entity is CannonFactory cannonFactory && entity.Owner.Team == this.Owner.Team)
+                cannonFactory.GiveAmmo(this);
         }
 
         public void GetTired()

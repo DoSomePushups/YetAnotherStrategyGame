@@ -41,8 +41,10 @@
         {
             var entity = cell.Entity;
             var owner = entity?.Owner;
+            var fieldHeight = GameSession.GameField.Height;
+            var onTerritory = Team == Team.First ? cell.Y >= fieldHeight - (fieldHeight / 3) : cell.Y <= fieldHeight / 3;
 
-            if (entity != null && !entity.IsAvailable)
+            if (entity != null && this == owner && !entity.IsAvailable)
                 return;
 
             if (SelectedUnit != null)
@@ -52,12 +54,11 @@
             }
             else if (entity == null || owner == this)
             {
-
                 if (entity is ISpawnBuilding spawnBuilding)
                     spawnBuilding.TrySpawn();
                 else if (entity is IUnit unit)
                     SelectedUnit = unit;
-                else if (entity == null && SelectedBuilding != null)
+                else if (entity == null && SelectedBuilding != null && onTerritory)
                     TryBuild(cell);
                 else if (entity is IProductionBuilding productionBuilding)
                     productionBuilding.Produce();
@@ -68,7 +69,7 @@
         {
             var entity = cell.Entity;
             var owner = entity?.Owner;
-            if (owner == this && entity is IAmmunitionBuilding ammunitionBuilding)
+            if (owner == this && entity is IAmmunitionBuilding ammunitionBuilding && entity.IsAvailable)
                 ammunitionBuilding.ProduceAmmo();
         }
 

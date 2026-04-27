@@ -34,7 +34,7 @@ namespace YetAnotherStrategyGame
             this.Text = "Yet Another Strategy Game";
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-            this.TopMost = true;
+            //this.TopMost = true;
             this.BackColor = Color.FromArgb(190, 225, 150);
 
             // Инициализация контролов экранов

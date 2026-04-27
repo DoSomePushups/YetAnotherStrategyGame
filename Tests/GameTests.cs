@@ -28,8 +28,7 @@ namespace Tests
             Assert.That(firstPlayer.Id, Is.EqualTo(1));
             Assert.That(firstPlayer.Team, Is.EqualTo(Team.First));
             Assert.That(firstPlayer.Color, Is.EqualTo(TeamColor.Blue));
-            Assert.That(firstPlayer.OwnedBuildings, Is.Empty);
-            Assert.That(firstPlayer.OwnedUnits, Is.Empty);
+            Assert.That(firstPlayer.OwnedEntities, Is.Empty);
             Assert.That(firstPlayer.Food, Is.EqualTo(50));
             Assert.That(firstPlayer.Gold, Is.EqualTo(100));
 
@@ -37,8 +36,7 @@ namespace Tests
             Assert.That(secondPlayer.Id, Is.EqualTo(2));
             Assert.That(secondPlayer.Team, Is.EqualTo(Team.Second));
             Assert.That(secondPlayer.Color, Is.EqualTo(TeamColor.Red));
-            Assert.That(secondPlayer.OwnedBuildings, Is.Empty);
-            Assert.That(secondPlayer.OwnedUnits, Is.Empty);
+            Assert.That(secondPlayer.OwnedEntities, Is.Empty);
             Assert.That(secondPlayer.Food, Is.EqualTo(50));
             Assert.That(secondPlayer.Gold, Is.EqualTo(100));
 
@@ -79,7 +77,9 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.LeftClick(map[5, 12]);
+            var castleCell = map[5, 12];
+            MakeAvailable(castleCell);
+            player.LeftClick(castleCell);
             Assert.That(map[4, 11].Entity is Human);
             Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
         }
@@ -89,14 +89,18 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.LeftClick(map[5, 12]);
-            Assert.That(map[4, 11].Entity is Human);
-            Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+            var castleCell = map[5, 12];
+            var humanCell = map[4, 11];
+            MakeAvailable(castleCell);
+            player.LeftClick(castleCell);
+            Assert.That(humanCell.Entity is Human);
+            Assert.That(humanCell.Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
-            player.LeftClick(map[4, 11]);
+            MakeAvailable(humanCell);
+            player.LeftClick(humanCell);
             Assert.That(player.SelectedUnit is Human);
             player.LeftClick(map[4, 10]);
-            Assert.That(map[4, 11].Entity == null);
+            Assert.That(humanCell.Entity == null);
             Assert.That(map[4, 10].Entity is Human);
         }
 
@@ -105,19 +109,23 @@ namespace Tests
         {
             var player = Game.Session.FirstPlayer;
             var map = Game.Session.GameField.Map;
-            player.LeftClick(map[5, 12]);
-            Assert.That(map[4, 11].Entity is Human);
-            Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+            var castleCell = map[5, 12];
+            var humanCell = map[4, 11];
+            MakeAvailable(castleCell);
+            player.LeftClick(castleCell);
+            Assert.That(humanCell.Entity is Human);
+            Assert.That(humanCell.Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
-            player.LeftClick(map[4, 11]);
+            MakeAvailable(humanCell);
+            player.LeftClick(humanCell);
             Assert.That(player.SelectedUnit is Human);
-            var castleCell = map[4, 10];
-            castleCell.PutEntity(new Castle(map[4, 10], Game.Session.SecondPlayer));
-            Assert.That(castleCell.Entity is Castle);
-            Assert.That(castleCell.Entity.Owner == Game.Session.SecondPlayer);
-            Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP);
+            var enemyCastleCell = map[4, 10];
+            enemyCastleCell.PutEntity(new Castle(map[4, 10], Game.Session.SecondPlayer));
+            Assert.That(enemyCastleCell.Entity is Castle);
+            Assert.That(enemyCastleCell.Entity.Owner == Game.Session.SecondPlayer);
+            Assert.That(enemyCastleCell.Entity.HP == CastleInformation.MaxHP / 10);
             player.LeftClick(map[4, 10]);
-            Assert.That(castleCell.Entity.HP == CastleInformation.MaxHP - HumanInformation.Damage);
+            Assert.That(enemyCastleCell.Entity.HP == CastleInformation.MaxHP / 10 - HumanInformation.Damage);
         }
 
         [Test]
@@ -127,7 +135,9 @@ namespace Tests
             var map = Game.Session.GameField.Map;
             var humanCell = map[4, 11];
             var barracksCell = map[4,12];
-            player.LeftClick(map[5, 12]);
+            var castleCell = map[5, 12];
+            MakeAvailable(castleCell);
+            player.LeftClick(castleCell);
             Assert.That(humanCell.Entity is Human);
             Assert.That(humanCell.Entity.Owner, Is.EqualTo(player));
             Assert.That(player.SelectedUnit == null);
@@ -135,10 +145,48 @@ namespace Tests
             player.LeftClick(barracksCell);
             Assert.That(barracksCell.Entity is Barracks);
             Assert.That(barracksCell.Entity.Owner, Is.EqualTo(player));
+            MakeAvailable(humanCell);
             player.LeftClick(humanCell);
             Assert.That(player.SelectedUnit is Human);
+            MakeAvailable(barracksCell);
             player.LeftClick(barracksCell);
             Assert.That(humanCell.Entity is Warrior);
+        }
+
+        [Test]
+        public void CanProduceAmmo()
+        {
+            var player = Game.Session.FirstPlayer;
+            var map = Game.Session.GameField.Map;
+            var crossbowWorkshopCell = map[4, 12];
+            player.SelectStoreItem(BuildingType.CrossbowWorkshop);
+            player.LeftClick(crossbowWorkshopCell);
+            var crossbowWorkshop = crossbowWorkshopCell.Entity as CrossbowWorkshop;
+            Assert.That(crossbowWorkshop.AmmoAmount, Is.EqualTo(6));
+            MakeAvailable(crossbowWorkshopCell);
+            player.RightClick(crossbowWorkshopCell);
+            Assert.That(crossbowWorkshop.AmmoAmount, Is.EqualTo(CrossbowWorkshopInformation.AmmoCapacity));
+        }
+
+        public void MakeAvailable(Cell cell)
+        {
+            var entity = cell.Entity;
+            var toWait = entity switch
+            {
+                Warrior => WarriorInformation.RestTime,
+                Crossbowman => CrossbowmanInformation.RestTime,
+                Cannon => CannonInformation.RestTime,
+                Human => HumanInformation.RestTime,
+                Castle => CastleInformation.RestTime,
+                Mine => MineInformation.RestTime,
+                Farm => FarmInformation.RestTime,
+                Barracks => BarracksInformation.RestTime,
+                CrossbowWorkshop => CrossbowWorkshopInformation.RestTime,
+                CannonFactory => CannonFactoryInformation.RestTime,
+                _ => 0
+            };
+            for (var i = 0; i < toWait * 5 + 1; i++)
+                entity.HandleTick();
         }
     }
 }

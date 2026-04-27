@@ -16,94 +16,133 @@ namespace YetAnotherStrategyGame.Views.Controls
     {
         private Game Game;
         private Field Field;
+        private Player Player;
         private int CellSize;
+
+        private PictureBox FieldCanvas;
 
         public FieldControl(Game game, int cellSize)
         {
             Game = game;
             Field = Game.Session.GameField;
+            Player = Game.Session.FirstPlayer;
             CellSize = cellSize;
+            DoubleBuffered = true;
             InitializeComponent();
         }
-
+        
         public void InitializeComponent()
         {
             this.Size = new Size(Field.Width * CellSize, Field.Height * CellSize);
-            this.BackColor = Color.FromArgb(127, 179, 64);
-            for (var i = 0; i < Field.Width; i++)
+
+            FieldCanvas = new PictureBox();
+            FieldCanvas.Location = new Point(0, 0);
+            FieldCanvas.Size = this.Size;
+            FieldCanvas.BackColor = Color.FromArgb(127, 179, 64);
+            FieldCanvas.Paint += MainCanvas_Paint;
+            FieldCanvas.MouseDown += MainCanvas_MouseDown;
+            Controls.Add(FieldCanvas);
+            Game.Session.OnTick += () =>
             {
-                for (var j = 0; j < Field.Height; j++)
+                if (FieldCanvas.InvokeRequired)
+                    FieldCanvas.Invoke(new Action(FieldCanvas.Invalidate));
+                else
+                    FieldCanvas.Invalidate();
+            };
+            for (var gridX = 0; gridX < Field.Width; gridX++)
+                for (var gridY = 0; gridY < Field.Height; gridY++)
                 {
-                    var x = i;
-                    var y = j;
-                    var cellButton = new Button();
-                    var cell = Field.Map[x, y];
-                    cellButton.Location = new Point(i * CellSize, j * CellSize);
-                    cellButton.Size = new Size(CellSize, CellSize);
-                    cellButton.BackColor = Color.FromArgb(127, 179, 64);
-                    cellButton.FlatStyle = FlatStyle.Flat;
-                    DrawButtonSvg(cell, cellButton);
-                    cellButton.Paint += (s, e) =>
-                    {
-                        if (cell.Entity != null)
-                        {
-                            var (maxHP, restTime) = GetEntityInfo(cell.Entity);
-                            DrawEntityUI(e.Graphics, cell.Entity.HP, maxHP, cell.Entity.UnactionTime, restTime);
-                        }
-                    };
-                    Game.Session.OnTick += () =>
-                    {
-                        if (cell.Entity != null)
-                            cellButton.Invalidate();
-                    };
+                    var cell = Field.Map[gridX, gridY];
+                    var x = gridX;
+                    var y = gridY;
                     cell.CellChanged += (updatedCell) =>
                     {
-                        //Если из другого потока
-                        if (cellButton.InvokeRequired)
-                            cellButton.Invoke(new Action(() => DrawButtonSvg(updatedCell, cellButton)));
+                        // Инвалидируется только квадрат изменившейся клетки для оптимизации
+                        var invalidateAction = () => FieldCanvas.Invalidate(new Rectangle(x * CellSize, y * CellSize, CellSize, CellSize));
+                        if (FieldCanvas.InvokeRequired)
+                            FieldCanvas.Invoke(invalidateAction);
                         else
-                            DrawButtonSvg(updatedCell, cellButton);
+                            invalidateAction();
                     };
-                    cellButton.MouseClick += (sender, args) =>
-                    {
-                        if (args.Button == MouseButtons.Left)
-                            Game.Session.FirstPlayer.LeftClick(cell);
-                        else
-                            Game.Session.FirstPlayer.RightClick(cell);
-                    };  
-                    Controls.Add(cellButton);
                 }
+        }
+
+        private void MainCanvas_MouseDown(object sender, MouseEventArgs args)
+        {
+            var gridX = args.X / CellSize;
+            var gridY = args.Y / CellSize;
+            if (gridX >= 0 && gridX < Field.Width && gridY >= 0 && gridY < Field.Height)
+            {
+                var clickedCell = Field.Map[gridX, gridY];
+                if (args.Button == MouseButtons.Left)
+                    Player.LeftClick(clickedCell);
+                else if (args.Button == MouseButtons.Right)
+                    Player.RightClick(clickedCell);
             }
         }
 
-        private void DrawButtonSvg(Cell cell, Button cellButton)
+        private void MainCanvas_Paint(object sender, PaintEventArgs e)
         {
-            EntityType type = cell.Entity switch
+            var graphics = e.Graphics;
+            var selectedUnit = Player.SelectedUnit;
+            for (var gridX = 0; gridX < Field.Width; gridX++)
             {
-                Farm => EntityType.Farm,
-                Mine => EntityType.Mine,
-                Castle => EntityType.Castle,
-                Barracks => EntityType.Barracks,
-                CrossbowWorkshop => EntityType.CrossbowWorkshop,
-                CannonFactory => EntityType.CannonFactory,
-                Human => EntityType.Human,
-                Warrior => EntityType.Warrior,
-                Crossbowman => EntityType.Crossbowman,
-                Cannon => EntityType.Cannon,
-                _ => EntityType.None
-            };
-            if (Game.SvgImages.TryGetValue(type, out var image))
-            {
-                cellButton.Image = image;
-                if (cell.Entity.Owner.Team == Team.Second)
-                    cellButton.BackColor = Color.FromArgb(100, 255, 0, 0);
+                for (var gridY = 0; gridY < Field.Height; gridY++)
+                {
+                    var cell = Field.Map[gridX, gridY];
+                    var pixelX = gridX * CellSize;
+                    var pixelY = gridY * CellSize;
+                    var cellColor = Color.FromArgb(127, 179, 64);
+                    if (cell.Entity != null && cell.Entity.Owner.Team == Team.Second)
+                        cellColor = Color.FromArgb(100, 255, 0, 0);
+                    using (var backgroundBrush = new SolidBrush(cellColor))
+                        graphics.FillRectangle(backgroundBrush, pixelX, pixelY, CellSize, CellSize);
+                    using (var gridPen = new Pen(Color.FromArgb(50, 0, 0, 0), 1))
+                        graphics.DrawRectangle(gridPen, pixelX, pixelY, CellSize, CellSize);
+                    var entityType = GetEntityType(cell.Entity);
+                    if (entityType != EntityType.None && Game.SvgImages.TryGetValue(entityType, out var entityImage))
+                        graphics.DrawImage(entityImage, pixelX, pixelY, CellSize, CellSize);
+                    if (cell.Entity != null)
+                    {
+                        var (maxHP, restTime) = GetEntityInfo(cell.Entity);
+                        DrawEntityUI(graphics, cell.Entity, maxHP, restTime, pixelX, pixelY);
+                    }
+                }
             }
-            else
-            {
-                cellButton.Image = null;
-                cellButton.BackColor = Color.FromArgb(127, 179, 64);
-            }
+            if (selectedUnit != null)
+                DrawUnitRange(graphics, selectedUnit);
         }
+
+        private void DrawUnitRange(Graphics graphics, IUnit selectedUnit)
+        {
+            var attackRange = selectedUnit switch
+            {
+                Crossbowman => CrossbowmanInformation.Range,
+                Cannon => CannonInformation.Range,
+                _ => 1
+            };
+            var unitLocation = selectedUnit.Location;
+            var rectangleX = (unitLocation.X - attackRange) * CellSize;
+            var rectangleY = (unitLocation.Y - attackRange) * CellSize;
+            var rectangleSize = (attackRange * 2 + 1) * CellSize;
+            using (var radiusPen = new Pen(Color.Blue, 4))
+                graphics.DrawRectangle(radiusPen, rectangleX, rectangleY, rectangleSize, rectangleSize);
+        }
+
+        private EntityType GetEntityType(IEntity entity) => entity switch
+        {
+            Farm => EntityType.Farm,
+            Mine => EntityType.Mine,
+            Castle => EntityType.Castle,
+            Barracks => EntityType.Barracks,
+            CrossbowWorkshop => EntityType.CrossbowWorkshop,
+            CannonFactory => EntityType.CannonFactory,
+            Human => EntityType.Human,
+            Warrior => EntityType.Warrior,
+            Crossbowman => EntityType.Crossbowman,
+            Cannon => EntityType.Cannon,
+            _ => EntityType.None
+        };
 
         private (int, int) GetEntityInfo(IEntity entity) => entity switch
         {
@@ -120,48 +159,66 @@ namespace YetAnotherStrategyGame.Views.Controls
             _ => throw new ArgumentException("Unknown entity")
         };
 
-        private void DrawEntityUI(Graphics g, int hp, int maxHp, int unactionTime, int restTime)
+        private void DrawEntityUI(Graphics graphics, IEntity entity, int maxHp, int restTime, int offsetX, int offsetY)
+        {
+            var currentHp = entity.HP;
+            var currentUnactionTime = entity.UnactionTime;
+
+            DrawHealthBar(graphics, currentHp, maxHp, offsetX, offsetY);
+
+            if (currentUnactionTime < restTime * 5)
+                DrawBattery(graphics, currentUnactionTime, restTime, offsetX, offsetY);
+
+            if (entity is IRangedUnit rangedUnit)
+                DrawAmount(graphics, rangedUnit.AmmoLeft, 2, offsetX, offsetY);
+            else
+            {
+                if (entity is IProductionBuilding prodBuilding)
+                    DrawAmount(graphics, prodBuilding.ItemAmount, 2, offsetX, offsetY);
+                if (entity is IAmmunitionBuilding ammoBuilding)
+                    DrawAmount(graphics, ammoBuilding.AmmoAmount, 28, offsetX, offsetY);
+            }
+        }
+
+        private void DrawHealthBar(Graphics graphics, int currentHp, int maxHp, int offsetX, int offsetY)
         {
             var barWidth = 60;
             var barHeight = 5;
-            var x = (CellSize - barWidth) / 2;
-            var y = CellSize - barHeight - 5;
-            var percent = (double)hp / maxHp;
-            var fillWidth = (int)(barWidth * percent);
+            var positionX = offsetX + (CellSize - barWidth) / 2;
+            var positionY = offsetY + CellSize - barHeight - 5;
+            var hpPercent = (double)currentHp / maxHp;
+            var fillWidth = (int)(barWidth * hpPercent);
             using (SolidBrush redBrush = new SolidBrush(Color.Red))
-                g.FillRectangle(redBrush, x, y, barWidth, barHeight);
-
+                graphics.FillRectangle(redBrush, positionX, positionY, barWidth, barHeight);
             if (fillWidth > 0)
                 using (SolidBrush greenBrush = new SolidBrush(Color.LimeGreen))
-                    g.FillRectangle(greenBrush, x, y, fillWidth, barHeight);
-
+                    graphics.FillRectangle(greenBrush, positionX, positionY, fillWidth, barHeight);
             using (Pen borderPen = new Pen(Color.Black, 1))
-                g.DrawRectangle(borderPen, x, y, barWidth, barHeight);
-
-            if (unactionTime < restTime * 5)
-                DrawBattery(g, unactionTime, restTime);
+                graphics.DrawRectangle(borderPen, positionX, positionY, barWidth, barHeight);
         }
 
-        private void DrawBattery(Graphics g, int unactionTime, int restTime)
+        private void DrawBattery(Graphics graphics, int currentUnactionTime, int restTime, int offsetX, int offsetY)
         {
-            var width = 20;
-            var height = 20;
-            var x = 57;
-            var y = 3;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-            var rect = new Rectangle(x, y, width, height);
+            var batteryWidth = 20;
+            var batteryHeight = 20;
+            var positionX = offsetX + 57;
+            var positionY = offsetY + 3;
+            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var batteryRectangle = new Rectangle(positionX, positionY, batteryWidth, batteryHeight);
             var startAngle = 0;
-            var sweepAngle = (unactionTime / ((float)restTime * 5)) * 360f; ;
-
-            using (var brush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
-                g.FillPie(brush, rect, startAngle, sweepAngle);
+            var sweepAngle = (currentUnactionTime / ((float)restTime * 5)) * 360f;
+            using (var whiteTransparentBrush = new SolidBrush(Color.FromArgb(200, 255, 255, 255)))
+                graphics.FillPie(whiteTransparentBrush, batteryRectangle, startAngle, sweepAngle);
         }
 
-        //private void DrawUnitRange(Graphics g, int range, int x, int y)
-        //{
-        //    using (Pen borderPen = new Pen(Color.Blue, 2))
-        //        g.DrawRectangle(borderPen, x - CellSize * range, y - CellSize * range, range * 2 + CellSize, range * 2 + CellSize);
-        //}
+        private void DrawAmount(Graphics graphics, int currentAmount, int textYOffset, int offsetX, int offsetY)
+        {
+            var textXOffset = 5;
+            var positionX = offsetX + textXOffset;
+            var positionY = offsetY + textYOffset;
+            var amountFont = new Font("Arial", 16);
+            using (var whiteTextBrush = new SolidBrush(Color.White))
+                graphics.DrawString(currentAmount.ToString(), amountFont, whiteTextBrush, positionX, positionY);
+        }
     }
 }

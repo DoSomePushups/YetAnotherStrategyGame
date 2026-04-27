@@ -34,7 +34,7 @@
         public Crossbowman(Cell location, Player owner)
         {
             HP = CrossbowmanInformation.MaxHP / 10;
-            AmmoLeft = 3;
+            AmmoLeft = 0;
             Location = location;
             Owner = owner;
             location.PutEntity(this);
@@ -96,6 +96,8 @@
                 entity.TakeDamage(CrossbowmanInformation.Damage);
                 GetTired();
             }
+            else if (entity is CrossbowWorkshop crossbowWorkshop && entity.Owner.Team == this.Owner.Team)
+                crossbowWorkshop.GiveAmmo(this);
         }
 
         public void GetTired()
