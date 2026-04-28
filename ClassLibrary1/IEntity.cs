@@ -29,5 +29,7 @@
         public void Die();
 
         public void GetTired();
+
+        public int GetMaxHP();
     }
 }

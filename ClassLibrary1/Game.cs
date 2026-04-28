@@ -59,7 +59,9 @@ namespace Model
 
             public int TimeTicks { get; private set; }
 
-            public int TimeSeconds => TimeTicks / 5;
+            public int TimeSeconds => TimeTicks / (1000 / TickInterval);
+
+            public const int TickInterval = 200;
 
             public GameSession(int fieldWidth, int fieldHeight)
             {
@@ -75,7 +77,7 @@ namespace Model
                 startCell1.PutEntity(castle1);
                 startCell2.PutEntity(castle2);
                 TimeTicks = 0;
-                Timer = new(200);
+                Timer = new(TickInterval);
                 Timer.Elapsed += (s, e) => OnTick?.Invoke();
                 Timer.AutoReset = true;
                 Timer.Start();

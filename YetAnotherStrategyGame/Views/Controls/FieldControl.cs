@@ -78,6 +78,8 @@ namespace YetAnotherStrategyGame.Views.Controls
                     Player.LeftClick(clickedCell);
                 else if (args.Button == MouseButtons.Right)
                     Player.RightClick(clickedCell);
+                else if (args.Button == MouseButtons.Middle)
+                    Player.MiddleClick(clickedCell);
             }
         }
 

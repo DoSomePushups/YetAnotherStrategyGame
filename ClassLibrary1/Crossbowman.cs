@@ -105,5 +105,7 @@
             UnactionTime = 0;
             IsAvailable = false;
         }
+
+        public int GetMaxHP() => CrossbowmanInformation.MaxHP;
     }
 }

@@ -80,5 +80,7 @@
             UnactionTime = 0;
             IsAvailable = false;
         }
+
+        public int GetMaxHP() => MineInformation.MaxHP;
     }
 }

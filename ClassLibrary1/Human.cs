@@ -33,6 +33,12 @@
 
         public void HandleTick()
         {
+            if (IsAvailable && HP == HumanInformation.MaxHP)
+            {
+                var resourceCell = FindResourceCell(Owner.GameSession.GameField);
+                if (resourceCell != null)
+                    ActUpon(resourceCell);
+            }
             if (UnactionTime >= HumanInformation.RestTime * 5)
             {
                 IsAvailable = true;
@@ -99,10 +105,30 @@
             }
         }
 
+        private Cell? FindResourceCell(Field field)
+        {
+            for (var i = -1; i <= 1; i++)
+                for (var j = -1; j <= 1; j++)
+                {
+                    var x = Location.X + i;
+                    var y = Location.Y + j;
+                    if (field.CheckCellExist(x, y))
+                    {
+                        var cell = field.Map[x, y];
+                        var entity = cell.Entity;
+                        if (entity is IResourceBuilding resourceBuilding && entity.Owner == this.Owner && entity.IsAvailable && entity.HP == entity.GetMaxHP())
+                            return cell;
+                    }
+                }
+            return null;
+        }
+
         public void GetTired()
         {
             UnactionTime = 0;
             IsAvailable = false;
         }
+
+        public int GetMaxHP() => HumanInformation.MaxHP;
     }
 }

@@ -73,6 +73,14 @@
                 ammunitionBuilding.ProduceAmmo();
         }
 
+        public void MiddleClick(Cell cell)
+        {
+            var entity = cell.Entity;
+            var owner = entity?.Owner;
+            if (owner == this && entity != null)
+                entity.Die();
+        }
+
         public void SelectStoreItem(BuildingType? buildingType)
         {
             if (SelectedBuilding != buildingType)
