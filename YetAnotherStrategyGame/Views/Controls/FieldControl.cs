@@ -74,6 +74,7 @@ namespace YetAnotherStrategyGame.Views.Controls
             if (gridX >= 0 && gridX < Field.Width && gridY >= 0 && gridY < Field.Height)
             {
                 var clickedCell = Field.Map[gridX, gridY];
+                //MessageBox.Show(clickedCell.X.ToString(), clickedCell.Y.ToString());
                 if (args.Button == MouseButtons.Left)
                     Player.LeftClick(clickedCell);
                 else if (args.Button == MouseButtons.Right)

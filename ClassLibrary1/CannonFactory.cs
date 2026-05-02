@@ -35,6 +35,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -47,6 +49,7 @@
             AmmoAmount = 2;
             Location = location;
             Owner = owner;
+            Type = EntityType.CannonFactory;
         }
 
         public void Produce()
@@ -79,6 +82,7 @@
                 location.PutEntity(cannon);
                 ItemAmount--;
                 Owner.GameSession.OnTick += () => cannon.HandleTick();
+                Owner.OwnedEntities.Add(cannon);
                 GetTired();
                 return true;
             }
@@ -124,6 +128,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void GetTired()

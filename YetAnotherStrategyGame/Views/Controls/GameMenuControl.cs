@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Model;
+using Svg;
+using Svg.Pathing;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Media;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
-using Model;
-using Svg;
-using Svg.Pathing;
 
 namespace YetAnotherStrategyGame.Views.Controls
 {
@@ -31,13 +32,13 @@ namespace YetAnotherStrategyGame.Views.Controls
             var stats = new Stats();
             stats.Food.Quantity.Text = Player.Food.ToString();
             stats.Gold.Quantity.Text = Player.Gold.ToString();
-            Player.StatsChanged += (newGold, newFood) =>
+            Player.StatsChanged += (newGold, newFood) => Invoke(() =>
             {
                 stats.Food.Quantity.Text = Player.Food.ToString();
                 stats.Gold.Quantity.Text = Player.Gold.ToString();
-            };
-            Game.Session.OnTick += () =>
-                stats.Time.Quantity.Text = (Game.Session.TimeSeconds).ToString();
+            });
+            Game.Session.OnTick += () => 
+                Invoke(() => stats.Time.Quantity.Text = (Game.Session.TimeSeconds).ToString());
             stats.Location = new Point(0, 0);
             var store = new Store(Player);
             store.Location = new Point(62, 273);

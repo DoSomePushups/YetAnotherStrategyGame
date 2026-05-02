@@ -28,7 +28,7 @@ namespace Tests
             Assert.That(firstPlayer.Id, Is.EqualTo(1));
             Assert.That(firstPlayer.Team, Is.EqualTo(Team.First));
             Assert.That(firstPlayer.Color, Is.EqualTo(TeamColor.Blue));
-            Assert.That(firstPlayer.OwnedEntities, Is.Empty);
+            Assert.That(firstPlayer.OwnedEntities.Count == 1);
             Assert.That(firstPlayer.Food, Is.EqualTo(50));
             Assert.That(firstPlayer.Gold, Is.EqualTo(100));
 
@@ -36,7 +36,7 @@ namespace Tests
             Assert.That(secondPlayer.Id, Is.EqualTo(2));
             Assert.That(secondPlayer.Team, Is.EqualTo(Team.Second));
             Assert.That(secondPlayer.Color, Is.EqualTo(TeamColor.Red));
-            Assert.That(secondPlayer.OwnedEntities, Is.Empty);
+            Assert.That(secondPlayer.OwnedEntities.Count == 1);
             Assert.That(secondPlayer.Food, Is.EqualTo(50));
             Assert.That(secondPlayer.Gold, Is.EqualTo(100));
 

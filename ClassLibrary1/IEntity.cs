@@ -16,6 +16,8 @@
 
         bool IsAvailable { get; }
 
+        EntityType Type { get; }
+
         Cell Location { get; }
 
         Player Owner { get; }

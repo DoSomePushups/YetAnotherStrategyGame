@@ -61,19 +61,21 @@ namespace Model
 
             public int TimeSeconds => TimeTicks / (1000 / TickInterval);
 
-            public const int TickInterval = 200;
+            public const int TickInterval = 200; //200
 
             public GameSession(int fieldWidth, int fieldHeight)
             {
                 LastPlayerId = 0;
-                FirstPlayer = new Player(this, "User", ++LastPlayerId);
-                SecondPlayer = new Player(this, "AI", ++LastPlayerId);
+                FirstPlayer = new Player(this, "User", ++LastPlayerId, false);
+                SecondPlayer = new Player(this, "AI", ++LastPlayerId, true);
                 Players = new HashSet<Player>() { FirstPlayer, SecondPlayer };
                 GameField = new Field(fieldWidth, fieldHeight);
                 var startCell1 = GameField.Map[fieldWidth / 2, fieldHeight - 1];
                 var startCell2 = GameField.Map[fieldWidth / 2, 0];
                 var castle1 = new Castle(startCell1, FirstPlayer);
+                FirstPlayer.OwnedEntities.Add(castle1);
                 var castle2 = new Castle(startCell2, SecondPlayer);
+                SecondPlayer.OwnedEntities.Add(castle2);
                 startCell1.PutEntity(castle1);
                 startCell2.PutEntity(castle2);
                 TimeTicks = 0;
@@ -86,25 +88,11 @@ namespace Model
                     TimeTicks++;
                     castle1.HandleTick();
                     castle2.HandleTick();
+                    SecondPlayer.Robot.MakeMove();
                 };
             }
 
             public event Action OnTick;
         }
-    }
-
-    public enum EntityType
-    {
-        None,
-        Human,
-        Warrior,
-        Crossbowman,
-        Cannon,
-        Farm,
-        Mine,
-        Castle,
-        Barracks,
-        CrossbowWorkshop,
-        CannonFactory
     }
 }

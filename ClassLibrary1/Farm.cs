@@ -8,9 +8,9 @@
 
         public static int CostFood { get; } = 5;
 
-        public static int RestTime { get; } = 60;
+        public static int RestTime { get; } = 15;
 
-        public static int ResourceProductionQuantity { get; private set; } = 3;
+        public static int ResourceProductionQuantity { get; private set; } = 2;
 
         public static PassiveResourceType PassiveResourceType { get; } = PassiveResourceType.Food;
     }
@@ -23,6 +23,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -32,6 +34,7 @@
             HP = FarmInformation.MaxHP / 10;
             Location = location;
             Owner = owner;
+            Type = EntityType.Farm;
             location.PutEntity(this);
         }
 
@@ -46,7 +49,7 @@
             if (UnactionTime >= FarmInformation.RestTime * 5)
             {
                 IsAvailable = true;
-                if (UnactionTime >= FarmInformation.RestTime * 10)
+                if (UnactionTime >= FarmInformation.RestTime * 6)
                     Heal(Math.Max(FarmInformation.MaxHP / 200, 1));
             }
             UnactionTime++;
@@ -73,6 +76,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void GetTired()

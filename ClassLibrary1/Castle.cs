@@ -21,6 +21,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -31,6 +33,7 @@
             UnactionTime = 0;
             Location = location;
             Owner = owner;
+            Type = EntityType.Castle;
         }
 
         public void HandleTick()
@@ -65,6 +68,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void TrySpawn()

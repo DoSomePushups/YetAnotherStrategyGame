@@ -35,6 +35,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -46,6 +48,7 @@
             AmmoAmount = 6;
             Location = location;
             Owner = owner;
+            Type = EntityType.CrossbowWorkshop;
             location.PutEntity(this);
         }
 
@@ -81,6 +84,7 @@
                 GiveAmmo(crossbowman);
                 location.PutEntity(crossbowman);
                 Owner.GameSession.OnTick += () => crossbowman.HandleTick();
+                Owner.OwnedEntities.Add(crossbowman);
                 ItemAmount--;
                 GetTired();
                 return true;
@@ -127,6 +131,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void GetTired()

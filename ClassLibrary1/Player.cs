@@ -4,6 +4,8 @@
     {
         public Game.GameSession GameSession { get; }
 
+        public IRobot Robot { get; }
+
         public string Name { get; private set; }
 
         public int Id { get; private set; }
@@ -24,7 +26,7 @@
 
         public IUnit? SelectedUnit { get; private set; }
 
-        public Player(Game.GameSession session, string name, int id)
+        public Player(Game.GameSession session, string name, int id, bool isRobot)
         {
             GameSession = session;
             Name = name;
@@ -35,6 +37,8 @@
             Gold = 100;
             Food = 50;
             SelectedBuilding = null;
+            if (isRobot)
+                Robot = new Robot0(GameSession, this);
         }
 
         public void LeftClick(Cell cell)

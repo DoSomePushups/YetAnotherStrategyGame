@@ -64,8 +64,8 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            int centerX = this.Width / 2;
-            int startY = this.Height / 4;
+            var centerX = this.Width / 2;
+            var startY = this.Height / 4;
 
             titleLabel.Location = new Point(centerX - titleLabel.Width / 2, 50);
             freePlayButton.Location = new Point(centerX - freePlayButton.Width / 2, startY);

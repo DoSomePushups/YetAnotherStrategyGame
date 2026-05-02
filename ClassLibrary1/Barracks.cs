@@ -27,6 +27,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -38,6 +40,7 @@
             ItemAmount = 1;
             Location = location;
             Owner = owner;
+            Type = EntityType.Barracks;
         }
 
         public void Produce()
@@ -56,6 +59,7 @@
                 var warrior = new Warrior(location, Owner);
                 location.PutEntity(warrior);
                 Owner.GameSession.OnTick += () => warrior.HandleTick();
+                Owner.OwnedEntities.Add(warrior);
                 ItemAmount--;
                 GetTired();
                 return true;
@@ -95,6 +99,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void GetTired()

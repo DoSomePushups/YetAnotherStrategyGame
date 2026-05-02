@@ -20,6 +20,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -29,6 +31,7 @@
             HP = WarriorInformation.MaxHP / 10;
             Location = location;
             Owner = owner;
+            Type = EntityType.Warrior;
             location.PutEntity(this);
         }
 
@@ -64,6 +67,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         private void MoveTo(Cell location)

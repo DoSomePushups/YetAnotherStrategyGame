@@ -8,9 +8,9 @@
 
         public static int CostFood { get; } = 0;
 
-        public static int RestTime { get; } = 30;
+        public static int RestTime { get; } = 8;
 
-        public static int ResourceProductionQuantity { get; private set; } = 8;
+        public static int ResourceProductionQuantity { get; private set; } = 5;
 
         public static PassiveResourceType PassiveResourceType { get; } = PassiveResourceType.Gold;
     }
@@ -23,6 +23,8 @@
 
         public bool IsAvailable { get; private set; }
 
+        public EntityType Type { get; private set; }
+
         public Cell Location { get; private set; }
 
         public Player Owner { get; private set; }
@@ -32,6 +34,7 @@
             HP = MineInformation.MaxHP / 10;
             Location = location;
             Owner = owner;
+            Type = EntityType.Mine;
             location.PutEntity(this);
         }
 
@@ -40,7 +43,7 @@
             if (UnactionTime >= MineInformation.RestTime * 5)
             {
                 IsAvailable = true;
-                if (UnactionTime >= MineInformation.RestTime * 10)
+                if (UnactionTime >= MineInformation.RestTime * 6)
                     Heal(Math.Max(MineInformation.MaxHP / 200, 1));
             }
             UnactionTime++;
@@ -73,6 +76,7 @@
         {
             Location.RemoveEntity();
             Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.OwnedEntities.Remove(this);
         }
 
         public void GetTired()
