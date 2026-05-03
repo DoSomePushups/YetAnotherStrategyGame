@@ -53,7 +53,8 @@
 
             if (SelectedUnit != null)
             {
-                SelectedUnit.ActUpon(cell);
+                if (SelectedUnit.HP > 0)
+                    SelectedUnit.ActUpon(cell);
                 SelectedUnit = null;
             }
             else if (entity == null || owner == this)
