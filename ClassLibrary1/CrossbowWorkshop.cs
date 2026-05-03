@@ -4,7 +4,7 @@
     {
         public static int MaxHP { get; } = 1200;
 
-        public static int CostGold { get; } = 50;
+        public static int CostGold { get; } = 60;
 
         public static int CostFood { get; } = 0;
 
