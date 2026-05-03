@@ -44,10 +44,8 @@ namespace YetAnotherStrategyGame.Views.Controls
             Controls.Add(FieldCanvas);
             Game.Session.OnTick += () =>
             {
-                if (FieldCanvas.InvokeRequired)
-                    FieldCanvas.Invoke(new Action(FieldCanvas.Invalidate));
-                else
-                    FieldCanvas.Invalidate();
+                if (IsHandleCreated)
+                    FieldCanvas.BeginInvoke(new Action(FieldCanvas.Invalidate));
             };
             for (var gridX = 0; gridX < Field.Width; gridX++)
                 for (var gridY = 0; gridY < Field.Height; gridY++)
@@ -59,9 +57,9 @@ namespace YetAnotherStrategyGame.Views.Controls
                     {
                         // Инвалидируется только квадрат изменившейся клетки для оптимизации
                         var invalidateAction = () => FieldCanvas.Invalidate(new Rectangle(x * CellSize, y * CellSize, CellSize, CellSize));
-                        if (FieldCanvas.InvokeRequired)
-                            FieldCanvas.Invoke(invalidateAction);
-                        else
+                        if (FieldCanvas.InvokeRequired && IsHandleCreated)
+                            FieldCanvas.BeginInvoke(invalidateAction);
+                        else if (!FieldCanvas.InvokeRequired)
                             invalidateAction();
                     };
                 }
@@ -74,13 +72,15 @@ namespace YetAnotherStrategyGame.Views.Controls
             if (gridX >= 0 && gridX < Field.Width && gridY >= 0 && gridY < Field.Height)
             {
                 var clickedCell = Field.Map[gridX, gridY];
-                //MessageBox.Show(clickedCell.X.ToString(), clickedCell.Y.ToString());
-                if (args.Button == MouseButtons.Left)
-                    Player.LeftClick(clickedCell);
-                else if (args.Button == MouseButtons.Right)
-                    Player.RightClick(clickedCell);
-                else if (args.Button == MouseButtons.Middle)
-                    Player.MiddleClick(clickedCell);
+                Game.Session.EnqueueAction(() =>
+                {
+                    if (args.Button == MouseButtons.Left)
+                        Player.LeftClick(clickedCell);
+                    else if (args.Button == MouseButtons.Right)
+                        Player.RightClick(clickedCell);
+                    else if (args.Button == MouseButtons.Middle)
+                        Player.MiddleClick(clickedCell);
+                });
             }
         }
 

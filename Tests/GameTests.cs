@@ -79,9 +79,13 @@ namespace Tests
             var map = Game.Session.GameField.Map;
             var castleCell = map[5, 12];
             MakeAvailable(castleCell);
+            var initialFood = player.Food;
+            var initialGold = player.Gold;
             player.LeftClick(castleCell);
             Assert.That(map[4, 11].Entity is Human);
             Assert.That(map[4, 11].Entity.Owner, Is.EqualTo(player));
+            Assert.That(player.Food, Is.EqualTo(initialFood - CastleInformation.SpawnCost));
+            Assert.That(player.Gold, Is.EqualTo(initialGold));
         }
 
         [Test]

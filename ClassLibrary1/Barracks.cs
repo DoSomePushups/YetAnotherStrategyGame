@@ -4,7 +4,7 @@
     {
         public static int MaxHP { get; } = 1200;
 
-        public static int CostGold { get; } = 25;
+        public static int CostGold { get; } = 20;
 
         public static int CostFood { get; } = 0;
 
@@ -58,7 +58,7 @@
             {
                 var warrior = new Warrior(location, Owner);
                 location.PutEntity(warrior);
-                Owner.GameSession.OnTick += () => warrior.HandleTick();
+                Owner.GameSession.OnTick += warrior.HandleTick;
                 Owner.OwnedEntities.Add(warrior);
                 ItemAmount--;
                 GetTired();
@@ -98,7 +98,7 @@
         public void Die()
         {
             Location.RemoveEntity();
-            Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.GameSession.OnTick -= this.HandleTick;
             Owner.OwnedEntities.Remove(this);
         }
 

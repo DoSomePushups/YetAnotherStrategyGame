@@ -113,7 +113,7 @@
                 StatsChanged?.Invoke(Food, Gold);
                 var building = createBuilding();
                 cell.PutEntity(building);
-                GameSession.OnTick += () => building.HandleTick();
+                GameSession.OnTick += building.HandleTick;
                 SelectedBuilding = null;
                 OwnedEntities.Add(building);
             }

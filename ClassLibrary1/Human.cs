@@ -71,7 +71,7 @@
         public void Die()
         {
             Location.RemoveEntity();
-            Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.GameSession.OnTick -= this.HandleTick;
             Owner.OwnedEntities.Remove(this);
         }
 
@@ -100,7 +100,10 @@
             else if (this.Owner.Team == entity.Owner.Team)
             {
                 if (entity is IProductionBuilding productionBuilding && productionBuilding.TryTrain(Location))
-                    Owner.GameSession.OnTick -= () => this.HandleTick();
+                {
+                    Owner.GameSession.OnTick -= this.HandleTick;
+                    Owner.OwnedEntities.Remove(this);
+                }
                 else if (entity is IResourceBuilding resourceBuilding)
                 {
                     resourceBuilding.Collect();

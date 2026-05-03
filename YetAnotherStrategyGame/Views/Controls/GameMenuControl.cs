@@ -32,13 +32,18 @@ namespace YetAnotherStrategyGame.Views.Controls
             var stats = new Stats();
             stats.Food.Quantity.Text = Player.Food.ToString();
             stats.Gold.Quantity.Text = Player.Gold.ToString();
-            Player.StatsChanged += (newGold, newFood) => Invoke(() =>
+            Player.StatsChanged += (newFood, newGold) =>
             {
-                stats.Food.Quantity.Text = Player.Food.ToString();
-                stats.Gold.Quantity.Text = Player.Gold.ToString();
-            });
-            Game.Session.OnTick += () => 
-                Invoke(() => stats.Time.Quantity.Text = (Game.Session.TimeSeconds).ToString());
+                if (IsHandleCreated) BeginInvoke(() =>
+                {
+                    stats.Food.Quantity.Text = newFood.ToString();
+                    stats.Gold.Quantity.Text = newGold.ToString();
+                });
+            };
+            Game.Session.OnTick += () =>
+            {
+                if (IsHandleCreated) BeginInvoke(() => stats.Time.Quantity.Text = (Game.Session.TimeSeconds).ToString());
+            };
             stats.Location = new Point(0, 0);
             var store = new Store(Player);
             store.Location = new Point(62, 273);

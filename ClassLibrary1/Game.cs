@@ -1,4 +1,5 @@
 ﻿using Svg;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Timers;
 
@@ -63,6 +64,14 @@ namespace Model
 
             public const int TickInterval = 200; //200
 
+            // Потокобезопасная очередь
+            private ConcurrentQueue<Action> ActionQueue = new ConcurrentQueue<Action>();
+
+            public void EnqueueAction(Action action)
+            {
+                ActionQueue.Enqueue(action);
+            }
+
             public GameSession(int fieldWidth, int fieldHeight)
             {
                 LastPlayerId = 0;
@@ -80,16 +89,18 @@ namespace Model
                 startCell2.PutEntity(castle2);
                 TimeTicks = 0;
                 Timer = new(TickInterval);
-                Timer.Elapsed += (s, e) => OnTick?.Invoke();
+                Timer.Elapsed += (s, e) =>
+                {
+                    while (ActionQueue.TryDequeue(out var action))
+                        action();
+                    OnTick?.Invoke();
+                };
                 Timer.AutoReset = true;
                 Timer.Start();
-                OnTick += () =>
-                {
-                    TimeTicks++;
-                    castle1.HandleTick();
-                    castle2.HandleTick();
-                    SecondPlayer.Robot.MakeMove();
-                };
+                OnTick += () => TimeTicks++;
+                OnTick += castle1.HandleTick;
+                OnTick += castle2.HandleTick;
+                OnTick += SecondPlayer.Robot.MakeMove;
             }
 
             public event Action OnTick;

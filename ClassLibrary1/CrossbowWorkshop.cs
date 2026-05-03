@@ -83,7 +83,7 @@
                 var crossbowman = new Crossbowman(location, Owner);
                 GiveAmmo(crossbowman);
                 location.PutEntity(crossbowman);
-                Owner.GameSession.OnTick += () => crossbowman.HandleTick();
+                Owner.GameSession.OnTick += crossbowman.HandleTick;
                 Owner.OwnedEntities.Add(crossbowman);
                 ItemAmount--;
                 GetTired();
@@ -130,7 +130,7 @@
         public void Die()
         {
             Location.RemoveEntity();
-            Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.GameSession.OnTick -= this.HandleTick;
             Owner.OwnedEntities.Remove(this);
         }
 

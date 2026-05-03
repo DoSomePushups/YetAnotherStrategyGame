@@ -4,7 +4,7 @@
     {
         public static int MaxHP { get; } = 1800;
 
-        public static int CostGold { get; } = 80;
+        public static int CostGold { get; } = 120;
 
         public static int CostFood { get; } = 0;
 
@@ -12,11 +12,11 @@
 
         public static int RestTime { get; } = 8;
 
-        public static int ProductionCost { get; } = 15;
+        public static int ProductionCost { get; } = 30;
 
         public static int Capacity { get; } = 2;
 
-        public static int AmmoCost { get; } = 4;
+        public static int AmmoCost { get; } = 6;
 
         public static int AmmoCapacity { get; } = 6;
 
@@ -81,7 +81,7 @@
                 GiveAmmo(cannon);
                 location.PutEntity(cannon);
                 ItemAmount--;
-                Owner.GameSession.OnTick += () => cannon.HandleTick();
+                Owner.GameSession.OnTick += cannon.HandleTick;
                 Owner.OwnedEntities.Add(cannon);
                 GetTired();
                 return true;
@@ -127,7 +127,7 @@
         public void Die()
         {
             Location.RemoveEntity();
-            Owner.GameSession.OnTick -= () => this.HandleTick();
+            Owner.GameSession.OnTick -= this.HandleTick;
             Owner.OwnedEntities.Remove(this);
         }
 
