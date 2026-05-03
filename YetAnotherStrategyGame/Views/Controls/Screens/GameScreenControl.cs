@@ -1,10 +1,12 @@
 ﻿using Model;
+using Model;
+using Svg;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 using YetAnotherStrategyGame.Views.Controls;
-using Model;
 
 namespace YetAnotherStrategyGame.Views.Controls.Screens
 {

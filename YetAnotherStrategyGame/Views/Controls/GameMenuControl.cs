@@ -74,11 +74,11 @@ namespace YetAnotherStrategyGame.Views.Controls
 
         public class Stats : Panel
         {
-            private static string[] svgPaths = new string[]
+            private static SvgType[] svgPaths = new SvgType[]
             {
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "wheat.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "gold.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "clock.svg")
+                SvgType.Wheat,
+                SvgType.Gold,
+                SvgType.Clock
             };
 
             public StatControl Food;
@@ -105,14 +105,14 @@ namespace YetAnotherStrategyGame.Views.Controls
 
         public class Store : Panel
         {
-            private static string[] svgPaths = new string[]
+            private static EntityType[] svgEntityTypes = new EntityType[]
             {
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "farm.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "SwordBarracks.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "GoldMine.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "CrossbowBarracks.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "castle.svg"),
-                Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "CannonFactory.svg")
+                EntityType.Farm,
+                EntityType.Barracks,
+                EntityType.Mine,
+                EntityType.CrossbowWorkshop,
+                EntityType.Castle,
+                EntityType.CannonFactory
             };
 
             public StoreItemControl[] Items;
@@ -125,7 +125,7 @@ namespace YetAnotherStrategyGame.Views.Controls
                     for (var j = 0; j < 2; j++)
                     {
                         var index = 2 * i + j;
-                        Items[index] = new StoreItemControl(svgPaths[index]);
+                        Items[index] = new StoreItemControl(svgEntityTypes[index]);
                         Items[index].ActionButton.Click += (s, e) =>
                         {
                             BuildingType? item = index switch
@@ -152,13 +152,12 @@ namespace YetAnotherStrategyGame.Views.Controls
             public PictureBox SvgHolder;
             public Label Quantity;
 
-            public StatControl(string svgPath)
+            public StatControl(SvgType svgType)
             {
-                var svgDoc = SvgDocument.Open(svgPath);
                 SvgHolder = new PictureBox();
                 SvgHolder.Size = new Size(100, 100);
                 SvgHolder.Location = new Point(0, 0);
-                SvgHolder.Image = svgDoc.Draw(100, 100);
+                SvgHolder.Image = SvgClass.SvgImagesBig[svgType];
                 Quantity = new Label();
                 Quantity.Text = "000";
                 Quantity.ForeColor = Color.White;
@@ -176,17 +175,16 @@ namespace YetAnotherStrategyGame.Views.Controls
             public StoreItemCost PriceLabelFood;
             public StoreItemCost PriceLabelGold;
 
-            public StoreItemControl(string svgPath)
+            public StoreItemControl(EntityType svgEntityType)
             {
                 Size = new Size(180, 260); // Высота с учетом текста
-                var svgDoc = SvgDocument.Open(svgPath);
                 ActionButton = new Button
                 {
                     Size = new Size(180, 180),
                     BackColor = Color.FromArgb(112, 177, 112),
                     Location = new Point(0, 0),
                     FlatStyle = FlatStyle.Flat,
-                    Image = svgDoc.Draw(160, 160)
+                    Image = SvgClass.SvgImagesEntitiesBig[svgEntityType]
                 };
 
                 var prices = new Panel
@@ -195,12 +193,12 @@ namespace YetAnotherStrategyGame.Views.Controls
                     Location = new Point(0, 186)
                 };
 
-                PriceLabelFood = new StoreItemCost(Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "wheat.svg"))
+                PriceLabelFood = new StoreItemCost(SvgType.Wheat)
                 {
                     Dock = DockStyle.Left
                 };
 
-                PriceLabelGold = new StoreItemCost(Path.Combine(AppContext.BaseDirectory, "Views", "SVGs", "gold.svg"))
+                PriceLabelGold = new StoreItemCost(SvgType.Gold)
                 {
                     Dock = DockStyle.Right
                 };
@@ -218,14 +216,13 @@ namespace YetAnotherStrategyGame.Views.Controls
             public PictureBox SvgHolder;
             public Label Quantity;
 
-            public StoreItemCost(string svgPath)
+            public StoreItemCost(SvgType svgType)
             {
                 Size = new Size(87, 45);
-                var svgDoc = SvgDocument.Open(svgPath);
                 SvgHolder = new PictureBox();
                 SvgHolder.Size = new Size(45, 45);
                 SvgHolder.Location = new Point(0, 0);
-                SvgHolder.Image = svgDoc.Draw(45, 45);
+                SvgHolder.Image = SvgClass.SvgImagesSmall[svgType];
                 Quantity = new Label();
                 Quantity.Text = "000";
                 Quantity.ForeColor = Color.White;

@@ -103,7 +103,7 @@ namespace YetAnotherStrategyGame.Views.Controls
                     using (var gridPen = new Pen(Color.FromArgb(50, 0, 0, 0), 1))
                         graphics.DrawRectangle(gridPen, pixelX, pixelY, CellSize, CellSize);
                     var entityType = GetEntityType(cell.Entity);
-                    if (entityType != EntityType.None && Game.SvgImages.TryGetValue(entityType, out var entityImage))
+                    if (entityType != EntityType.None && SvgClass.SvgImagesEntities.TryGetValue(entityType, out var entityImage))
                         graphics.DrawImage(entityImage, pixelX, pixelY, CellSize, CellSize);
                     if (cell.Entity != null)
                     {

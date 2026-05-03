@@ -9,53 +9,73 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Views\SVGs\CannonFactory.svg" />
+    <None Remove="Views\SVGs\cannon_unit.svg" />
+    <None Remove="Views\SVGs\castle.svg" />
+    <None Remove="Views\SVGs\clock.svg" />
+    <None Remove="Views\SVGs\crossbow.svg" />
+    <None Remove="Views\SVGs\CrossbowBarracks.svg" />
+    <None Remove="Views\SVGs\crossbowman.svg" />
+    <None Remove="Views\SVGs\farm.svg" />
+    <None Remove="Views\SVGs\gold.svg" />
+    <None Remove="Views\SVGs\GoldMine.svg" />
+    <None Remove="Views\SVGs\Human.svg" />
+    <None Remove="Views\SVGs\question.svg" />
+    <None Remove="Views\SVGs\SwordBarracks.svg" />
+    <None Remove="Views\SVGs\warrior.svg" />
+    <None Remove="Views\SVGs\wheat.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Views\SVGs\CannonFactory.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\cannon_unit.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\castle.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\clock.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\crossbow.svg" />
+    <EmbeddedResource Include="Views\SVGs\CrossbowBarracks.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\crossbowman.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\farm.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\gold.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\GoldMine.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\Human.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\question.svg" />
+    <EmbeddedResource Include="Views\SVGs\SwordBarracks.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\warrior.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SVGs\wheat.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Svg" Version="3.4.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary1\Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Views\SVGs\CannonFactory.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\cannon_unit.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\castle.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\clock.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\CrossbowBarracks.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\crossbowman.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\farm.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\gold.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\GoldMine.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\Human.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\SwordBarracks.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\warrior.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Views\SVGs\wheat.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
