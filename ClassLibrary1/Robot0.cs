@@ -1,7 +1,15 @@
-﻿namespace Model
+﻿using System.Runtime.CompilerServices;
+using System.Text;
+
+namespace Model
 {
     public class Robot0 : IRobot
     {
+        public const int ControlRange = 5;
+        public const int IntruderRange = 7;
+        public const int EmergencyRange = 4;
+        //public StringBuilder DebugBuilder = new StringBuilder();
+
         public Game.GameSession Session { get; }
         public Field Field => Session.GameField;
         public Player Player { get; }
@@ -46,75 +54,91 @@
 
             foreach (var entity in Player.OwnedEntities)
             {
-                if (entity is Farm farm) 
+                if (entity is Farm farm)
                     farms.Add(farm);
-                else if (entity is Mine mine) 
+                else if (entity is Mine mine)
                     mines.Add(mine);
-                else if (entity is Barracks barrack) 
+                else if (entity is Barracks barrack)
                     barracks.Add(barrack);
-                else if (entity is CrossbowWorkshop crossbowWorkshop) 
+                else if (entity is CrossbowWorkshop crossbowWorkshop)
                     crossbowWorkshops.Add(crossbowWorkshop);
-                else if (entity is CannonFactory cannonFactory) 
+                else if (entity is CannonFactory cannonFactory)
                     cannonFactories.Add(cannonFactory);
-                else if (entity is Castle castle) 
+                else if (entity is Castle castle)
                     castles.Add(castle);
-                else if (entity is Human human) 
+                else if (entity is Human human)
                     humans.Add(human);
-                else if (entity is Warrior warrior) 
+                else if (entity is Warrior warrior)
                     warriors.Add(warrior);
-                else if (entity is Crossbowman crossbowman) 
+                else if (entity is Crossbowman crossbowman)
                     crossbowmen.Add(crossbowman);
-                else if (entity is Cannon cannon) 
+                else if (entity is Cannon cannon)
                     cannons.Add(cannon);
             }
 
             // Уборка мёртвых юнитов из памяти
             var deadUnits = Brain.Keys.Where(unit => !Player.OwnedEntities.Contains(unit)).ToList();
-            foreach (var dead in deadUnits) 
+            foreach (var dead in deadUnits)
                 Brain.Remove(dead);
 
             // 2. Постройка зданий
-            if (farms.Count < 3) 
+            if (farms.Count == 0)
+            {
+                Player.SelectStoreItem(BuildingType.Farm);
+                Player.LeftClick(Field.Map[Field.Width - 1, 1]);
+            }
+            else if (mines.Count == 0)
+            {
+                Player.SelectStoreItem(BuildingType.Mine);
+                Player.LeftClick(Field.Map[0, 1]);
+            }
+            else if (crossbowWorkshops.Count < 1)
+                TryBuildBuilding(BuildingType.CrossbowWorkshop, 3);
+            else if (farms.Count < 3)
                 TryBuildBuilding(BuildingType.Farm, 0);
-            else if (mines.Count < 4) 
+            else if (mines.Count < 4)
                 TryBuildBuilding(BuildingType.Mine, 0);
-            else if (barracks.Count < 1) 
+            else if (farms.Count < 5)
+                TryBuildBuilding(BuildingType.Farm, 0);
+            else if (mines.Count < 5)
+                TryBuildBuilding(BuildingType.Mine, 0);
+            else if (barracks.Count < 1)
                 TryBuildBuilding(BuildingType.Barracks, 3);
-            else if (crossbowWorkshops.Count < 1) 
-                TryBuildBuilding(BuildingType.CrossbowWorkshop, 2);
-            else if (cannonFactories.Count < 1) 
-                TryBuildBuilding(BuildingType.CannonFactory, 2);
+            else if (cannonFactories.Count < 1)
+                TryBuildBuilding(BuildingType.CannonFactory, 3);
             else if (Random.Next(100) < 5) // 5% шанс построить дополнительную постройку каждый тик
             {
-                if (farms.Count < 6)
-                    TryBuildBuilding(BuildingType.Farm, 0);
+                if (farms.Count < 8)
+                    TryBuildBuilding(BuildingType.Farm, 2);
                 else if (mines.Count < 8)
-                    TryBuildBuilding(BuildingType.Mine, 0);
+                    TryBuildBuilding(BuildingType.Mine, 2);
                 else if (barracks.Count < 2)
                     TryBuildBuilding(BuildingType.Barracks, 3);
                 else if (crossbowWorkshops.Count < 2)
-                    TryBuildBuilding(BuildingType.CrossbowWorkshop, 2);
+                    TryBuildBuilding(BuildingType.CrossbowWorkshop, 3);
                 else if (cannonFactories.Count < 2)
-                    TryBuildBuilding(BuildingType.CannonFactory, 2);
+                    TryBuildBuilding(BuildingType.CannonFactory, 3);
             }
 
             // 3. Производство снаряжения и аммуниции
-            foreach (var barrack in barracks) 
-                if (barrack.ItemAmount == 0) 
+            foreach (var barrack in barracks)
+                if (barrack.ItemAmount == 0)
                     Player.LeftClick(barrack.Location);
-            foreach (var crossbowWorkshop in crossbowWorkshops) 
-                if (crossbowWorkshop.ItemAmount == 0) 
-                    Player.LeftClick(crossbowWorkshop.Location);
-                else if (crossbowWorkshop.AmmoAmount <= CrossbowWorkshopInformation.AmmoCapacity / 2)
+            foreach (var crossbowWorkshop in crossbowWorkshops)
+                if (crossbowWorkshop.AmmoAmount <= CrossbowWorkshopInformation.AmmoCapacity / 2 && crossbowmen.Count > 0
+                    || crossbowWorkshop.AmmoAmount == 0)
                     Player.RightClick(crossbowWorkshop.Location);
-            foreach (var cannonFactory in cannonFactories) 
-                if (cannonFactory.ItemAmount == 0) 
-                    Player.LeftClick(cannonFactory.Location);
-                else if (cannonFactory.AmmoAmount <= CrossbowWorkshopInformation.AmmoCapacity / 2)
+                else if (crossbowWorkshop.ItemAmount == 0)
+                    Player.LeftClick(crossbowWorkshop.Location);
+            foreach (var cannonFactory in cannonFactories)
+                if (cannonFactory.AmmoAmount <= CannonFactoryInformation.AmmoCapacity / 2)
                     Player.RightClick(cannonFactory.Location);
+                else if (cannonFactory.ItemAmount == 0)
+                    Player.LeftClick(cannonFactory.Location);
+
 
             // 4. Спавн людей
-            if (humans.Count < 4 && Player.Food >= CastleInformation.SpawnCost)
+            if (humans.Count < 3 && Player.Food >= CastleInformation.SpawnCost)
             {
                 foreach (var castle in castles)
                     if (castle.IsAvailable)
@@ -127,17 +151,17 @@
             // 5. Сканирование опасностей
             var enemyEntities = Session.Players.First(player => player != Player).OwnedEntities.ToList();
             var enemyUnits = enemyEntities.Where(entity => entity is not Human).OfType<IUnit>().ToList();
-            var intruders = enemyUnits.Where(enemy => enemy.Location.Y <= 8).ToList();
-            var isDireEmergency = intruders.Any(enemy => enemy.Location.Y <= 3);
+            var intruders = enemyUnits.Where(enemy => enemy.Location.Y <= IntruderRange).ToList();
+            var isDireEmergency = intruders.Any(enemy => enemy.Location.Y <= EmergencyRange);
 
             // 6. Фнализ своей армии
             var military = warriors.Cast<IUnit>().Concat(crossbowmen).Concat(cannons).ToList();
             var healthyMilitary = military.Where(militaryUnit => militaryUnit.HP == militaryUnit.GetMaxHP()).ToList();
 
             // Атака либо при более менее большой армии либо при перевесе сил
-            if (healthyMilitary.Count >= 6 || healthyMilitary.Count >= enemyUnits.Count * 2) 
+            if (healthyMilitary.Count >= 10 || healthyMilitary.Count >= enemyUnits.Count * 3)
                 IsAttackingPhase = true;
-            else if (military.Count <= 2) 
+            else if (military.Count <= 2)
                 IsAttackingPhase = false;
 
             var allMyUnits = humans.Cast<IUnit>().Concat(military).ToList();
@@ -148,9 +172,9 @@
             // 7. Раздача ролей и целей
             foreach (var unit in allMyUnits)
             {
-                if (!unit.IsAvailable) 
+                if (!unit.IsAvailable)
                     continue;
-                if (!Brain.ContainsKey(unit)) 
+                if (!Brain.ContainsKey(unit))
                     Brain[unit] = new UnitMemory();
 
                 var unitMemory = Brain[unit];
@@ -181,7 +205,9 @@
                 if (unitMemory.Role == Role.HarvesterLeft || unitMemory.Role == Role.HarvesterRight)
                     unitMemory.Intent = Intent.Harvest;
                 else if (unitMemory.Role == Role.Recruit)
+                {
                     unitMemory.Intent = Intent.Upgrade;
+                }
                 else if (unitMemory.Role == Role.Military)
                 {
                     if (unit is IRangedUnit rangedUnit && rangedUnit.AmmoLeft == 0)
@@ -206,8 +232,8 @@
                 case Intent.Heal:
                 case Intent.Rally:
                     // Нахождение места где бы постоять
-                    if (unitMemory.TargetCell == null || (!unitMemory.TargetCell.IsEmpty && unitMemory.TargetCell != controlledUnit.Location) 
-                        || unitMemory.TargetCell.Y > 5)
+                    if (unitMemory.TargetCell == null || (!unitMemory.TargetCell.IsEmpty && unitMemory.TargetCell != controlledUnit.Location)
+                        || unitMemory.TargetCell.Y > ControlRange)
                         unitMemory.TargetCell = GetRandomEmptyCellInTerritory();
 
                     if (unitMemory.TargetCell != null)
@@ -235,7 +261,7 @@
                             .OfType<IResourceBuilding>()
                             .FirstOrDefault(resourceBuilding => resourceBuilding.Location.X >= Field.Width / 2);
 
-                    if (targetResourceBuilding != null 
+                    if (targetResourceBuilding != null
                         && (targetResourceBuilding.IsAvailable || controlledUnit.Location.GetDistance(targetResourceBuilding.Location) > 1))
                         ExecutePathOrAction(controlledUnit, targetResourceBuilding.Location, 1, ref unitMemory.Path);
                     break;
@@ -251,17 +277,20 @@
                         .FirstOrDefault(productionBuilding => productionBuilding.ItemAmount > 0)
                         : Player.OwnedEntities
                         .OfType<CannonFactory>()
-                        .FirstOrDefault(productionBuilding => productionBuilding.ItemAmount > 0)
-                        ?? Player.OwnedEntities
+                        .FirstOrDefault(productionBuilding => productionBuilding.ItemAmount > 0);
+                    if (targetProductionBuilding == null)
+                    {
+                        targetProductionBuilding = Player.OwnedEntities
                         .OfType<IProductionBuilding>()
                         .FirstOrDefault(productionBuilding => productionBuilding.ItemAmount > 0);
+                    }
                     if (targetProductionBuilding != null)
                         ExecutePathOrAction(controlledUnit, targetProductionBuilding.Location, 1, ref unitMemory.Path);
                     else
                     {
                         // Если негде получить специализацию, то просто отойти и ждать
-                        if (unitMemory.TargetCell == null || (!unitMemory.TargetCell.IsEmpty && unitMemory.TargetCell != controlledUnit.Location) 
-                            || unitMemory.TargetCell.Y > 5)
+                        if (unitMemory.TargetCell == null || (!unitMemory.TargetCell.IsEmpty && unitMemory.TargetCell != controlledUnit.Location)
+                            || unitMemory.TargetCell.Y > ControlRange)
                             unitMemory.TargetCell = GetRandomEmptyCellInTerritory();
                         if (unitMemory.TargetCell != null && controlledUnit.Location.GetDistance(unitMemory.TargetCell) > 0)
                             ExecutePathOrAction(controlledUnit, unitMemory.TargetCell, 0, ref unitMemory.Path);
@@ -282,7 +311,7 @@
                 case Intent.Attack:
                 case Intent.Defend:
                     var targets = unitMemory.Intent == Intent.Defend ? enemyEntities.Where(enemy => enemy.Location.Y <= 8).ToList() : enemyEntities;
-                    if (targets.Count == 0) 
+                    if (targets.Count == 0)
                         break;
                     if (controlledUnit is Cannon)
                     {
@@ -318,7 +347,7 @@
 
             // Попытка поставить на предпочтительной Y координате
             for (var x = 0; x < Field.Width; x++)
-                if (x != 5 && Field.Map[x, preferredY].IsEmpty) 
+                if (x != 5 && Field.Map[x, preferredY].IsEmpty)
                     emptyCells.Add(Field.Map[x, preferredY]);
 
             // При невозможности строим где можем
@@ -328,7 +357,7 @@
                 {
                     for (var x = 0; x < Field.Width; x++)
                     {
-                        if (x != 5 && Field.Map[x, y].IsEmpty) 
+                        if (x != 5 && Field.Map[x, y].IsEmpty)
                             emptyCells.Add(Field.Map[x, y]);
                     }
                 }
@@ -346,7 +375,7 @@
             var emptyCells = new List<Cell>();
             for (var x = 0; x < Field.Width; x++)
             {
-                for (var y = 2; y <= 5; y++)
+                for (var y = 2; y <= ControlRange; y++)
                 {
                     if (x != 5 && Field.Map[x, y].IsEmpty)
                         emptyCells.Add(Field.Map[x, y]);
@@ -357,7 +386,8 @@
 
         private void ExecutePathOrAction(IUnit unit, Cell targetCell, int actionRange, ref List<Cell> currentPath)
         {
-            if (targetCell == null) return;
+            if (targetCell == null)
+                return;
 
             // Цель в области атаки
             if (unit.Location.GetDistance(targetCell) <= actionRange)
@@ -405,14 +435,14 @@
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current == target) 
+                if (current == target)
                     break;
 
                 for (var i = -1; i <= 1; i++)
                 {
                     for (var j = -1; j <= 1; j++)
                     {
-                        if (i == 0 && j == 0) 
+                        if (i == 0 && j == 0)
                             continue;
                         var newX = current.X + i;
                         var newY = current.Y + j;
@@ -434,7 +464,7 @@
                 }
             }
 
-            if (!cameFrom.ContainsKey(target)) 
+            if (!cameFrom.ContainsKey(target))
                 return new List<Cell>();
 
             var path = new List<Cell>();

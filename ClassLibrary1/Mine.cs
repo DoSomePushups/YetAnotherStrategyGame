@@ -2,9 +2,9 @@
 {
     public class MineInformation : IResourceBuildingInformation
     {
-        public static int MaxHP { get; } = 800;
+        public static int MaxHP { get; } = 400;
 
-        public static int CostGold { get; } = 15;
+        public static int CostGold { get; } = 20;
 
         public static int CostFood { get; } = 0;
 

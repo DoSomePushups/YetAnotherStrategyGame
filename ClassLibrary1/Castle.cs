@@ -6,7 +6,7 @@
 
         public static int CostGold { get; } = 160;
 
-        public static int CostFood { get; } = 10;
+        public static int CostFood { get; } = 20;
 
         public static int RestTime { get; } = 6;
 
