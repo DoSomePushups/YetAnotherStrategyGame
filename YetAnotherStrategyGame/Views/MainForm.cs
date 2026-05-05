@@ -16,7 +16,7 @@ namespace YetAnotherStrategyGame
         // Экземпляры экранов
         private MainScreenControl MainScreen;
         private PlayOptionScreenControl PlayOptionScreen;
-        private GameScreenControl GameScreen;
+        private GameScreenControl? GameScreen = null;
 
         public MainForm()
         {
@@ -31,25 +31,29 @@ namespace YetAnotherStrategyGame
         private void InitializeComponent()
         {
             // Базовые настройки окна
-            this.Text = "Yet Another Strategy Game";
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.WindowState = FormWindowState.Maximized;
-            //this.TopMost = true;
-            this.BackColor = Color.FromArgb(190, 225, 150);
+            Text = "Yet Another Strategy Game";
+            FormBorderStyle = FormBorderStyle.None;
+            WindowState = FormWindowState.Maximized;
+            BackColor = Color.FromArgb(190, 225, 150);
 
             // Инициализация контролов экранов
             MainScreen = new MainScreenControl(Game);
             PlayOptionScreen = new PlayOptionScreenControl(Game);
-            GameScreen = new GameScreenControl(Game);
 
             // Добавление на форму
-            this.Controls.Add(MainScreen);
-            this.Controls.Add(PlayOptionScreen);
-            this.Controls.Add(GameScreen);
+            Controls.Add(MainScreen);
+            Controls.Add(PlayOptionScreen);
         }
 
         private void Game_OnStateChanged(GameState state)
         {
+            if (state != GameState.GameScreen && GameScreen != null)
+            {
+                Game.End();
+                GameScreen.Dispose();
+                GameScreen = null;
+            }
+
             // Переключения экранов на основе состояния модели
             switch (state)
             {
@@ -60,6 +64,11 @@ namespace YetAnotherStrategyGame
                     ShowPlayOptionScreen();
                     break;
                 case GameState.GameScreen:
+                    if (GameScreen == null)
+                    {
+                        GameScreen = new GameScreenControl(Game);
+                        Controls.Add(GameScreen);
+                    }
                     ShowGameScreen();
                     break;
 
@@ -69,7 +78,7 @@ namespace YetAnotherStrategyGame
         private void ShowMainScreen()
         {
             PlayOptionScreen.Hide();
-            GameScreen.Hide();
+            GameScreen?.Hide();
             MainScreen.Show();
             MainScreen.BringToFront();
         }
@@ -77,7 +86,7 @@ namespace YetAnotherStrategyGame
         private void ShowPlayOptionScreen()
         {
             MainScreen.Hide();
-            GameScreen.Hide();
+            GameScreen?.Hide();
             PlayOptionScreen.Show();
             PlayOptionScreen.BringToFront();
         }
@@ -89,5 +98,7 @@ namespace YetAnotherStrategyGame
             GameScreen.Show();
             GameScreen.BringToFront();
         }
+
+        
     }
 }

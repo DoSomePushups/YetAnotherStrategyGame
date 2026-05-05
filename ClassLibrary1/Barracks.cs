@@ -10,7 +10,7 @@
 
         public static Equipment EquipmentType { get; } = Equipment.Sword;
 
-        public static int RestTime { get; } = 6;
+        public static int RestTime { get; } = 5;
 
         public static int ProductionCost { get; } = 2;
 

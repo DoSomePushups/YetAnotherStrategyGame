@@ -11,10 +11,11 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
     public partial class MainScreenControl : UserControl
     {
         private Game Game;
-        private Label titleLabel;
-        private PlayButton playButton;
-        private SettingsButton settingsButton;
-        private ExitButton exitButton;
+        private Label TitleLabel;
+        private PlayButton PlayButton;
+        private SettingsButton SettingsButton;
+        private ExitButton ExitButton;
+        private Settings Settings;
 
         public MainScreenControl(Game game)
         {
@@ -27,7 +28,7 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
             this.BackColor = Color.FromArgb(190, 225, 150);
             this.Dock = DockStyle.Fill;
 
-            titleLabel = new Label()
+            TitleLabel = new Label()
             {
                 Text = "Yet Another Strategy Game",
                 Font = new Font("Arial", 36F, FontStyle.Bold),
@@ -36,24 +37,32 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
                 BackColor = Color.Transparent
             };
 
-            playButton = new PlayButton();
-            settingsButton = new SettingsButton();
-            exitButton = new ExitButton();
+            PlayButton = new PlayButton();
+            SettingsButton = new SettingsButton();
+            ExitButton = new ExitButton();
 
             // Привязка событий
-            playButton.Click += PlayButton_Click;
-            exitButton.Click += ExitButton_Click;
-            // settingsButton пока ничего не делает
+            PlayButton.Click += PlayButton_Click;
+            SettingsButton.Click += ShowSettings;
+            ExitButton.Click += ExitButton_Click;
 
-            this.Controls.Add(titleLabel);
-            this.Controls.Add(playButton);
-            this.Controls.Add(settingsButton);
-            this.Controls.Add(exitButton);
+            Controls.Add(TitleLabel);
+            Controls.Add(PlayButton);
+            Controls.Add(SettingsButton);
+            Controls.Add(ExitButton);
         }
 
         private void PlayButton_Click(object sender, EventArgs e)
         {
             Game?.ChangeGameState(GameState.PlayOptionScreen);
+        }
+
+        private void ShowSettings(object sender, EventArgs e)
+        {
+            Settings = new(Game);
+            Settings.Location = new Point(360, 197);
+            Controls.Add(Settings);
+            Settings.BringToFront();
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -68,10 +77,10 @@ namespace YetAnotherStrategyGame.Views.Controls.Screens
             var centerX = this.Width / 2;
             var startY = this.Height / 4;
 
-            titleLabel.Location = new Point(centerX - titleLabel.Width / 2, 50);
-            playButton.Location = new Point(centerX - playButton.Width / 2, startY);
-            settingsButton.Location = new Point(centerX - settingsButton.Width / 2, startY + 80);
-            exitButton.Location = new Point(centerX - exitButton.Width / 2, startY + 160);
+            TitleLabel.Location = new Point(centerX - TitleLabel.Width / 2, 50);
+            PlayButton.Location = new Point(centerX - PlayButton.Width / 2, startY);
+            SettingsButton.Location = new Point(centerX - SettingsButton.Width / 2, startY + 80);
+            ExitButton.Location = new Point(centerX - ExitButton.Width / 2, startY + 160);
         }
     }
 }

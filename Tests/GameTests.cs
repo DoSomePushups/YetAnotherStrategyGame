@@ -166,10 +166,20 @@ namespace Tests
             player.SelectStoreItem(BuildingType.CrossbowWorkshop);
             player.LeftClick(crossbowWorkshopCell);
             var crossbowWorkshop = crossbowWorkshopCell.Entity as CrossbowWorkshop;
-            Assert.That(crossbowWorkshop.AmmoAmount, Is.EqualTo(6));
+            Assert.That(crossbowWorkshop.AmmoAmount, Is.EqualTo(5));
             MakeAvailable(crossbowWorkshopCell);
             player.RightClick(crossbowWorkshopCell);
             Assert.That(crossbowWorkshop.AmmoAmount, Is.EqualTo(CrossbowWorkshopInformation.AmmoCapacity));
+        }
+
+        [Test]
+        public void AIModeWorks()
+        {
+            Assert.That(Game.IsAIMode, Is.False);
+            Game.End();
+            Game.ChangeAIMode(true);
+            Game.Start(11, 13);
+            Assert.That(Game.IsAIMode, Is.True);
         }
 
         public void MakeAvailable(Cell cell)

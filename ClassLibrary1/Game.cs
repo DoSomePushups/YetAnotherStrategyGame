@@ -8,11 +8,11 @@ namespace Model
 {
     public partial class Game
     {
-        
-
         public GameState State { get; private set; }
 
-        public GameSession Session { get; private set; }
+        public GameSession? Session { get; private set; }
+
+        public bool IsAIMode { get; private set; }
 
         public Game()
         {
@@ -21,7 +21,20 @@ namespace Model
 
         public void Start(int width, int height)
         {
-            Session = new(width, height);
+            if (IsAIMode)
+                Session = new(width, height, 1);
+            else
+                Session = new(width, height);
+        }
+
+        public void End()
+        {
+            Session = null;
+        }
+
+        public void ChangeAIMode(bool mode)
+        {
+            IsAIMode = mode;
         }
 
         public void ChangeGameState(GameState newState)
@@ -61,11 +74,11 @@ namespace Model
                 ActionQueue.Enqueue(action);
             }
 
-            public GameSession(int fieldWidth, int fieldHeight)
+            public GameSession(int fieldWidth, int fieldHeight, int playerAI = -1)
             {
                 LastPlayerId = 0;
-                FirstPlayer = new Player(this, "User", ++LastPlayerId, false);
-                SecondPlayer = new Player(this, "AI", ++LastPlayerId, true);
+                FirstPlayer = new Player(this, "User", ++LastPlayerId, playerAI);
+                SecondPlayer = new Player(this, "AI", ++LastPlayerId, 0);
                 Players = new HashSet<Player>() { FirstPlayer, SecondPlayer };
                 GameField = new Field(fieldWidth, fieldHeight);
                 var startCell1 = GameField.Map[fieldWidth / 2, fieldHeight - 1];
@@ -90,6 +103,8 @@ namespace Model
                 OnTick += castle1.HandleTick;
                 OnTick += castle2.HandleTick;
                 OnTick += SecondPlayer.Robot.MakeMove;
+                if (FirstPlayer.Robot != null)
+                    OnTick += FirstPlayer.Robot.MakeMove;
             }
 
             public event Action OnTick;

@@ -12,7 +12,7 @@
 
         public static AmmunitionType AmmoType { get; } = AmmunitionType.Arrows;
 
-        public static int Capacity { get; } = 6;
+        public static int Capacity { get; } = 5;
 
         public static int RestTime { get; } = 2;
     }

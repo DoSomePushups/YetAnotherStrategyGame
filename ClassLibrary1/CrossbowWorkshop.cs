@@ -10,7 +10,7 @@
 
         public static Equipment EquipmentType { get; } = Equipment.Crossbow;
 
-        public static int RestTime { get; } = 6;
+        public static int RestTime { get; } = 7;
 
         public static int ProductionCost { get; } = 5;
 
@@ -18,7 +18,7 @@
 
         public static int AmmoCost { get; } = 1;
 
-        public static int AmmoCapacity { get; } = 18;
+        public static int AmmoCapacity { get; } = 15;
 
         public static AmmunitionType AmmoType { get; } = AmmunitionType.Arrows;
     }
@@ -45,7 +45,7 @@
         {
             HP = CrossbowWorkshopInformation.MaxHP / 10;
             ItemAmount = 1;
-            AmmoAmount = 6;
+            AmmoAmount = 5;
             Location = location;
             Owner = owner;
             Type = EntityType.CrossbowWorkshop;

@@ -5,6 +5,6 @@
         MainScreen,
         PlayOptionScreen,
         GameScreen,
-        Paused
+        Settings
     }
 }

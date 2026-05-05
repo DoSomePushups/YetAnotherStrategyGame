@@ -26,7 +26,7 @@
 
         public IUnit? SelectedUnit { get; private set; }
 
-        public Player(Game.GameSession session, string name, int id, bool isRobot)
+        public Player(Game.GameSession session, string name, int id, int RobotNumber)
         {
             GameSession = session;
             Name = name;
@@ -37,8 +37,10 @@
             Gold = 100;
             Food = 50;
             SelectedBuilding = null;
-            if (isRobot)
+            if (RobotNumber == 0)
                 Robot = new Robot0(GameSession, this);
+            else if (RobotNumber == 1)
+                Robot = new Robot1(GameSession, this);
         }
 
         public void LeftClick(Cell cell)
